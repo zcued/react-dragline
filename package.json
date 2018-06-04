@@ -1,0 +1,60 @@
+{
+  "name": "react-drag-guideline",
+  "version": "0.0.1",
+  "description": "Guide lines to better align draggable children in React.",
+  "main": "index.js",
+  "scripts": {
+    "build": "",
+    "lint": "eslint ./src",
+    "test": "mocha --require @babel/register --require ./test/setup.js --require ignore-styles --recursive ./test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zcued/react-drag-guideline.git"
+  },
+  "keywords": [
+    "react",
+    "react-line",
+    "react-guideline",
+    "react-component-line",
+    "react-component-guideline",
+    "react-drag-line",
+    "react-drag-guideline",
+    "react-drag-ref-line"
+  ],
+  "author": "zcued",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/zcued/react-drag-guideline/issues"
+  },
+  "homepage": "https://github.com/zcued/react-drag-guideline#readme",
+  "devDependencies": {
+    "@babel/core": "^7.0.0-beta.44",
+    "@babel/register": "^7.0.0-beta.44",
+    "@babel/runtime": "^7.0.0-beta.44",
+    "babel-eslint": "^8.2.2",
+    "babel-loader": "^8.0.0-beta.0",
+    "babel-preset-next": "^1.1.3",
+    "chai": "^4.1.2",
+    "chai-as-promised": "^7.1.1",
+    "enzyme": "^3.3.0",
+    "enzyme-adapter-react-16": "^1.1.1",
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-loader": "^2.0.0",
+    "eslint-plugin-import": "^2.10.0",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
+    "eslint-plugin-react": "^7.7.0",
+    "extract-text-webpack-plugin": "^3.0.2",
+    "ignore-styles": "^5.0.1",
+    "jsdom": "^11.7.0",
+    "mocha": "^5.0.5",
+    "promises-aplus-tests": "^2.1.2",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
+    "webpack": "^3.10.0"
+  },
+  "dependencies": {
+    "react-draggable": "^2.2.6"
+  }
+}

@@ -1,14 +1,11 @@
 import React from 'react'
 import { expect } from 'chai'
-import Enzyme, { mount } from 'enzyme'
-import Adapter from 'enzyme-adapter-react-16'
+import { shallow } from 'enzyme'
 import Main from '../src/components/main'
 
-Enzyme.configure({ adapter: new Adapter() })
-
-describe('users page rendered succeed', () => {
-  it('user list rendered', () => {
-    const wrapper = mount(<Main />)
+describe('main page rendered succeed', () => {
+  it('main page rendered', () => {
+    const wrapper = shallow(<Main />)
     expect(wrapper.find('#main-page').length).to.equal(1)
   })
 })

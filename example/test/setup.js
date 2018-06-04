@@ -1,6 +1,8 @@
 import chaiAsPromised from 'chai-as-promised'
 import chai, { expect } from 'chai'
 import { JSDOM } from 'jsdom'
+import Enzyme from 'enzyme'
+import Adapter from 'enzyme-adapter-react-16'
 
 const jsdom = new JSDOM('<!doctype html><html><body></body></html>')
 const { window } = jsdom
@@ -22,3 +24,5 @@ copyProps(window, global)
 
 chai.use(chaiAsPromised)
 chai.should()
+
+Enzyme.configure({ adapter: new Adapter() })

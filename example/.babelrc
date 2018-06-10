@@ -1,6 +1,0 @@
-{
-  "plugins": ["react-hot-loader/babel"],
-  "presets": [["next", {
-    "modules": "commonjs"
-  }]]
-}

@@ -13,6 +13,10 @@ module.exports = {
       "error",
       "never"
     ],
+    'no-plusplus': 0,
+    'no-underscore-dangle': [2, { 'allowAfterThis': true }],
+    "react/prop-types": [2, { ignore: ['children'] }],
+    "no-return-assign": 0,
     'react/no-multi-comp': 0,
     'react/jsx-filename-extension': [
       1, {

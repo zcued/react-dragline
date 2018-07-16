@@ -16,6 +16,7 @@ module.exports = {
     'no-plusplus': 0,
     'no-underscore-dangle': [2, { 'allowAfterThis': true }],
     "react/prop-types": [2, { ignore: ['children'] }],
+    "object-curly-newline": 0,
     "no-return-assign": 0,
     'react/no-multi-comp': 0,
     'react/jsx-filename-extension': [

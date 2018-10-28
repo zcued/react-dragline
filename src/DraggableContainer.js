@@ -44,27 +44,74 @@ export default class DraggableContainer extends React.PureComponent {
   }
 
   componentDidMount() {
-
+    // console.log(this.$)
   }
 
-  // 初始化 child html dom
-  initChildDom = (ref, index) => {
-    this.children[index] = ref
+  initCompareCoordinate = (index) => {
+    const $children = Array.from(this.$.childNodes)
+    this.compareCoordinate = $children
+      .filter(($, i) => i !== index)
+      .map(($, i) => {
+        const {top, left, right, bottom} = $.getBoundingClientRect()
+
+        return {
+          top,
+          left,
+          right,
+          bottom,
+          key: i,
+          $,
+        }
+      })
   }
 
-  // 清除 this.children 内已被删除的 html dom
-  destroyChildDom = (index) => {
-    this.children.splice(index, 1)
+  // clear
+
+  calc = (key) => {
+    const $target = this.$.childNodes[key]
+    const targetCoordinate = $target.getBoundingClientRect()
+
+    const elsByX = this.findNearElementByDirection(targetCoordinate, 'x')
+    const elsByY = this.findNearElementByDirection(targetCoordinate, 'y')
+    // console.log(elsByX)
+    if (elsByX.length) {
+      console.log(elsByX)
+    }
+
+    if (elsByY.length) {
+      console.log(elsByY)
+    }
+  }
+
+  findNearElementByDirection(target, direction) {
+    return this.compareCoordinate
+      .map((compare) => this.isNear(target, compare, direction))
+      .filter(v => v)
+  }
+
+  isNear(r1, r2, dire) {
+    const [key1, key2] = dire === 'x' ? ['left', 'right'] : ['top', 'bottom']
+
+    return this.isSingleNear(r1, r2, key1) || this.isSingleNear(r1, r2, key2)
+  }
+
+  isSingleNear(v1, v2, dire) {
+    const distance = Math.abs(v1[dire] - v2[dire])
+
+    return distance <= 5
+      ? {dire, value: v1[dire] - v2[dire], index: v2.key}
+      : false
   }
 
   render() {
     const Tag = this.props.tag
 
     return (
-      <Tag>
+      <Tag ref={ref => this.$ = ref}>
         {this.props.children.map((child, index) => React.cloneElement(child, {
-          initialize: ref => this.initChildDom(ref, index),
-          destroy: () => this.destroy(index),
+          initCompareCoordinate: () => this.initCompareCoordinate(index),
+          'z-key': index + 1,
+          calc: () => this.calc(index),
         }))}
       </Tag>
     )

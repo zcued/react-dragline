@@ -1,4 +1,5 @@
 import React from 'react'
+// import ReactDom from 'react-dom'
 import { DraggableCore } from 'react-draggable'
 import PropTypes from 'prop-types'
 
@@ -7,8 +8,6 @@ import PropTypes from 'prop-types'
 export default class DraggableChild extends React.Component {
   static propTypes = {
     children: PropTypes.element.isRequired,
-    initialize: PropTypes.func.isRequired,
-    destroy: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
@@ -20,14 +19,22 @@ export default class DraggableChild extends React.Component {
     y: 0,
   }
 
+  componentDidMount() {
+
+  }
+
   componentWillUnmount() {
-    this.props.destroy()
+
+  }
+
+  handleStart = () => {
+    this.props.initCompareCoordinate()
   }
 
   handleDrag = (ev, b) => {
     const x = b.deltaX + this.state.x
     const y = b.deltaY + this.state.y
-
+    this.props.calc()
     this.setState({ x, y })
   }
 
@@ -41,12 +48,10 @@ export default class DraggableChild extends React.Component {
         grid={[1, 1]}
         onDrag={this.handleDrag}
         onStop={this.handleStop}
+        onStart={this.handleStart}
         position={{ x, y }}
       >
-        {React.cloneElement(this.props.children, {
-          style,
-          ref: ref => this.props.initialize(ref),
-        })}
+        {React.cloneElement(this.props.children, { style, 'data-z-key': this.props['z-key'] })}
       </DraggableCore>
     )
   }

@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import { unique } from './utils'
+// import { unique } from './utils'
 
 const VLine = styled.span`
   position: absolute;
@@ -19,133 +19,114 @@ const HLine = styled.span`
   background: #00FFFF;
 `
 
-export default class DraggableContainer extends React.Component {
+// const alignTypes = Object.freeze({
+//   t: 'top',
+//   l: 'left',
+//   b: 'bottom',
+//   r: 'right',
+//   v: 'ver',
+//   h: 'hor',
+// })
+
+export default class DraggableContainer extends React.PureComponent {
   static propTypes = {
-    Tag: PropTypes.string,
+    tag: PropTypes.string,
   }
 
   static defaultProps = {
-    Tag: 'div',
+    tag: 'div',
   }
 
   constructor(props) {
     super(props)
+
     this.state = {
+      activeIndex: [],
       vLine: [],
       hLine: [],
     }
-
-    this.dragChildIndex = -1
-    this.$target = {}
-    this.$children = []
   }
+
 
   componentDidMount() {
 
   }
 
-  componentWillUpdate() {
-    this.$children = []
-  }
-
-  componentDidUpdate() {
-
-  }
-
-  // top bottom ver => 渲染水平线
-  // left right hor => 渲染竖直线
-  static getGuideLineDirection(key) {
-    return ['top', 'bottom', 'ver'].includes(key) ? 'h' : 'v'
-  }
-
-  // top bottom ver => 真实坐标为top
-  // left right hor => 展示坐标为left
-  static getGuideLineActualDirection(key) {
-    return ['top', 'bottom', 'ver'].includes(key) ? 'top' : 'left'
-  }
-
-  getContainerPosition = (ref) => {
-    const rect = ref.getBoundingClientRect()
-    const { top, left } = rect
-    this.$target = {
-      $ref: ref,
-      top,
-      left,
-    }
-  }
-
-  getChildPosition = (index) => ref => {
-    if (!ref) return
-    const rect = ref.getBoundingClientRect()
-    const {
-      top, bottom, left, right,
-    } = rect
-    this.$children[index] = {
-      $ref: ref,
-      top,
-      bottom,
-      left,
-      right,
-      ver: Math.round(((bottom - top) / 2) + top),
-      hor: Math.round(((right - left) / 2) + left),
-    }
-  }
-
-  checkRenderGuideLine() {
-    const targetIndex = this.dragChildIndex
-    const {
-      top, bottom, left, right,
-    } = this.$children[targetIndex].$ref.getBoundingClientRect()
-    const targetRect = {
-      top,
-      bottom,
-      left,
-      right,
-      ver: Math.round(((bottom - top) / 2) + top),
-      hor: Math.round(((right - left) / 2) + left),
+  initCompareCoordinate = (index) => {
+    const $children = Array.from(this.$.childNodes)
+    const { top, left } = this.$.getBoundingClientRect()
+    this.compareCoordinate = {
+      top: [],
+      left: [],
+      right: [],
+      bottom: [],
+      horCenter: [],
+      verCenter: [],
     }
 
-    const lines = {
-      v: [],
-      h: [],
-    }
+    this.extraX = left
+    this.extraY = top
 
-    this.$children.forEach((rect, index) => {
-      if (index !== targetIndex) {
-        Object.keys(targetRect).forEach(key => {
-          if (rect[key] === targetRect[key]) {
-            const direKey = DraggableContainer.getGuideLineDirection(key)
-            const posKey = DraggableContainer.getGuideLineActualDirection(key)
-            console.log(`${targetRect[key]} - ${this.$target[posKey]} = ${targetRect[key] - this.$target[posKey]}`)
-            lines[direKey].push(targetRect[key] - this.$target[posKey])
-          }
-        })
+    $children
+      .filter(($, i) => i !== index)
+      .forEach(($) => {
+        const {top, left, right, bottom, width, height} = $.getBoundingClientRect()
+        this.checkExistAndPush(this.compareCoordinate.top, top)
+        this.checkExistAndPush(this.compareCoordinate.left, left)
+        this.checkExistAndPush(this.compareCoordinate.bottom, bottom)
+        this.checkExistAndPush(this.compareCoordinate.right, right)
+        this.checkExistAndPush(this.compareCoordinate.horCenter, left + (width / 2))
+        this.checkExistAndPush(this.compareCoordinate.verCenter, top + (height / 2))
+      })
+  }
+
+  calc = (key) => {
+    return (x, y) => {
+      const $target = this.$.childNodes[key]
+      const {top, left, right, bottom, width, height} = $target.getBoundingClientRect()
+      const targetCoordinate = {
+        top,
+        left,
+        right,
+        bottom,
+        horCenter: left + (width / 2),
+        verCenter: top + (height / 2),
       }
-    })
 
-    const vLine = unique(lines.v)
-    const hLine = unique(lines.h)
+      const vLine = []
+      const hLine = []
 
-    this.setState({ vLine, hLine })
-  }
+      Object.keys(targetCoordinate).forEach(key => {
+        const vKeys = ['left', 'right', 'horCenter']
 
-  handleDragStart(index) {
-    return () => {
-      this.dragChildIndex = index
+        if (this.compareCoordinate[key].includes(targetCoordinate[key])) {
+          if (vKeys.includes(key)) {
+            vLine.push(targetCoordinate[key] - this.extraX)
+          } else {
+            hLine.push(targetCoordinate[key] - this.extraY)
+          }
+        }
+      })
+
+      this.setState({vLine, hLine})
+
+      return {x, y}
     }
   }
 
-  handleDragging = () => {
-    this.checkRenderGuideLine()
+  clear = () => {
+    this.setState({vLine: [], hLine: []})
   }
 
-  handleDragStop = () => {
-    this.dragChildIndex = -1
-    this.setState({ vLine: [], hLine: [] })
+  checkExistAndPush(arr, v) {
+    if (arr.includes(v) === false) {
+      arr.push(v)
+    }
   }
 
   _renderGuideLine() {
     const { vLine, hLine } = this.state
+
     return (
       <React.Fragment>
         {vLine.map(v => <VLine key={`v-${v}`} style={{ left: v }} />)}
@@ -155,16 +136,16 @@ export default class DraggableContainer extends React.Component {
   }
 
   render() {
-    const { Tag } = this.props
+    const Tag = this.props.tag
 
     return (
-      <Tag style={{ position: 'relative' }} ref={this.getContainerPosition}>
+      <Tag style={{ position: 'relative' }} ref={ref => this.$ = ref}>
         {this.props.children.map((child, index) => React.cloneElement(child, {
-            passChildPosition: this.getChildPosition(index),
-            handleDragStart: this.handleDragStart(index),
-            handleDragging: this.handleDragging,
-            handleDragStop: this.handleDragStop,
-          }))}
+          initCompareCoordinate: () => this.initCompareCoordinate(index),
+          'z-key': index + 1,
+          calc: this.calc(index),
+          clear: this.clear,
+        }))}
         {this._renderGuideLine()}
       </Tag>
     )

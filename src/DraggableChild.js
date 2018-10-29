@@ -1,62 +1,62 @@
 import React from 'react'
-import Draggable from 'react-draggable'
+// import ReactDom from 'react-dom'
+import { DraggableCore } from 'react-draggable'
 import PropTypes from 'prop-types'
 
-
-const noop = () => {}
+// const noop = () => {}
 
 export default class DraggableChild extends React.Component {
   static propTypes = {
-    handleDragStart: PropTypes.func,
-    handleDragStop: PropTypes.func,
-    handleDragging: PropTypes.func,
-    passChildPosition: PropTypes.func,
+    children: PropTypes.element.isRequired,
   }
 
-  // eslint 无法检测到 React.cloneElement 传入的Props
   static defaultProps = {
-    handleDragStart: noop,
-    handleDragging: noop,
-    handleDragStop: noop,
-    passChildPosition: noop,
+
   }
 
-  constructor(props) {
-    super(props)
-    this.dragging = false
+  state = {
+    x: 0,
+    y: 0,
+  }
+
+  componentDidMount() {
+
+  }
+
+  componentWillUnmount() {
+
   }
 
   handleStart = () => {
-    // console.log('handleStart')
+    this.props.initCompareCoordinate()
   }
 
-  handleDrag = () => {
-    if (!this.dragging) {
-      this.dragging = true
-      this.props.handleDragStart()
-    }
-
-    this.props.handleDragging()
+  handleDrag = (ev, b) => {
+    const dragX = b.deltaX + this.state.x
+    const dragY = b.deltaY + this.state.y
+    const {x, y} = this.props.calc(dragX, dragY)
+    this.setState({ x, y })
   }
 
   handleStop = () => {
-    this.dragging = false
-    this.props.handleDragStop()
+    this.props.clear()
   }
 
-
   render() {
-    const child = React.cloneElement(this.props.children, {
-      ref: this.props.passChildPosition,
-    })
+    const { x, y } = this.state
+    const child = this.props.children
+    const style = { ...child.props.style, transform: `translate(${x}px, ${y}px)` }
+
     return (
-      <Draggable
-        onStart={this.handleStart}
+      <DraggableCore
+        grid={[1, 1]}
         onDrag={this.handleDrag}
         onStop={this.handleStop}
+        onStart={this.handleStart}
+        position={{ x, y }}
       >
-        {child}
-      </Draggable>
+        {React.cloneElement(this.props.children, { style, 'data-z-key': this.props['z-key'] })}
+      </DraggableCore>
     )
   }
 }

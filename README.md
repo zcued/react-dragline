@@ -25,3 +25,10 @@ ReactDOM.render(<Demo />, container)
 2. npm start
 The example will open in browser automatically
 ```
+
+
+# TODO
+1. 吸附功能
+2. props扩展（direction）
+3. 对齐线优化
+4. 初始化及controlled集成

@@ -1,11 +1,12 @@
 const path = require('path')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 
 module.exports = {
-  entry: './src/index.js',
+  entry: './example/example.js',
   output: {
-    path: path.resolve('./dist'),
-    filename: 'react-drag-guideline.min.js',
+    path: path.resolve('./docs'),
+    filename: 'bundle.js',
   },
   mode: 'production',
   devtool: 'source-map',
@@ -26,4 +27,10 @@ module.exports = {
       },
     ],
   },
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: './example/index.html',
+      filename: 'index.html',
+    }),
+  ],
 }

@@ -7,6 +7,7 @@
     "clean": "rimraf dist",
     "start": "NODE_ENV=dev webpack-dev-server --progress --color --config build --hot",
     "build": "npm run clean && NODE_ENV=prod webpack --config build",
+    "example": "rimraf docs && NODE_ENV=example webpack --config build",
     "lint": "eslint ./src",
     "test": "mocha --require @babel/register --require ./test/setup.js --require ignore-styles --recursive ./test"
   },

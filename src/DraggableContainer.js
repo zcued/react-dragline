@@ -1,4 +1,5 @@
 import React from 'react'
+// import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 // import { unique } from './utils'
@@ -31,86 +32,51 @@ const HLine = styled.span`
 export default class DraggableContainer extends React.PureComponent {
   static propTypes = {
     tag: PropTypes.string,
+    style: PropTypes.object,
   }
 
   static defaultProps = {
     tag: 'div',
+    style: {},
   }
 
   constructor(props) {
     super(props)
 
     this.state = {
-      activeIndex: [],
       vLine: [],
       hLine: [],
     }
   }
 
+  // 拖拽初始时 计算出所有元素的坐标信息，存储于this.$children
+  initCompareCoordinate = () => {
+    this.$children = this.props.children.map(({props}, i) => {
+      const $ = this.$.childNodes[i]
 
-  componentDidMount() {
-
-  }
-
-  initCompareCoordinate = (index) => {
-    const $children = Array.from(this.$.childNodes)
-    const { top, left } = this.$.getBoundingClientRect()
-    this.compareCoordinate = {
-      top: [],
-      left: [],
-      right: [],
-      bottom: [],
-      horCenter: [],
-      verCenter: [],
-    }
-
-    this.extraX = left
-    this.extraY = top
-
-    $children
-      .filter(($, i) => i !== index)
-      .forEach(($) => {
-        const {top, left, right, bottom, width, height} = $.getBoundingClientRect()
-        this.checkExistAndPush(this.compareCoordinate.top, top)
-        this.checkExistAndPush(this.compareCoordinate.left, left)
-        this.checkExistAndPush(this.compareCoordinate.bottom, bottom)
-        this.checkExistAndPush(this.compareCoordinate.right, right)
-        this.checkExistAndPush(this.compareCoordinate.horCenter, left + (width / 2))
-        this.checkExistAndPush(this.compareCoordinate.verCenter, top + (height / 2))
-      })
-  }
-
-  calc = (key) => {
-    return (x, y) => {
-      const $target = this.$.childNodes[key]
-      const {top, left, right, bottom, width, height} = $target.getBoundingClientRect()
-      const targetCoordinate = {
-        top,
-        left,
-        right,
-        bottom,
-        horCenter: left + (width / 2),
-        verCenter: top + (height / 2),
+      return {
+        $,
+        x: props.position.x,
+        y: props.position.y,
+        width: $.clientWidth,
+        height: $.clientHeight,
+        left: props.position.x,
+        right: props.position.x + $.clientWidth,
+        top: props.position.y,
+        bottom: props.position.y + $.clientHeight,
       }
+    })
+  }
 
-      const vLine = []
-      const hLine = []
+  calc = (index) => {
+    return (x, y) => {
+      const target = this.$children[index]
+      const compares = this.$children.filter((_, i) => i !== index)
 
-      Object.keys(targetCoordinate).forEach(key => {
-        const vKeys = ['left', 'right', 'horCenter']
-
-        if (this.compareCoordinate[key].includes(targetCoordinate[key])) {
-          if (vKeys.includes(key)) {
-            vLine.push(targetCoordinate[key] - this.extraX)
-          } else {
-            hLine.push(targetCoordinate[key] - this.extraY)
-          }
-        }
-      })
-
-      this.setState({vLine, hLine})
-
-      return {x, y}
+      return {
+        x: this.checkIsNearByX(x, compares, target),
+        y: this.checkIsNearByY(y, compares, target),
+      }
     }
   }
 
@@ -118,9 +84,53 @@ export default class DraggableContainer extends React.PureComponent {
     this.setState({vLine: [], hLine: []})
   }
 
-  checkExistAndPush(arr, v) {
-    if (arr.includes(v) === false) {
-      arr.push(v)
+  checkIsNearByX(x, compares, {width}) {
+    let minDistance = 99999
+    let vLineValue = 0
+
+    compares.forEach(({left, right}) => {
+      if (Math.abs(x - left) < Math.abs(minDistance)) {
+        minDistance = x - left
+        vLineValue = left
+      }
+
+      if (Math.abs(x + width - right) < Math.abs(minDistance)) {
+        minDistance = x - right + width
+        vLineValue = right
+      }
+    })
+
+    if (Math.abs(minDistance) < 5) {
+      this.setState({vLine: [vLineValue]})
+      return x - minDistance
+    } else {
+      this.setState({vLine: []})
+      return x
+    }
+  }
+
+  checkIsNearByY(y, compares, {height}) {
+    let minDistance = 99999
+    let hLineValue = 0
+
+    compares.forEach(({top, bottom}) => {
+      if (Math.abs(y - top) < Math.abs(minDistance)) {
+        minDistance = y - top
+        hLineValue = top
+      }
+
+      if (Math.abs(y + height - bottom) < Math.abs(minDistance)) {
+        minDistance = y - bottom + height
+        hLineValue = bottom
+      }
+    })
+
+    if (Math.abs(minDistance) < 5) {
+      this.setState({hLine: [hLineValue]})
+      return y - minDistance
+    } else {
+      this.setState({hLine: []})
+      return y
     }
   }
 
@@ -139,7 +149,7 @@ export default class DraggableContainer extends React.PureComponent {
     const Tag = this.props.tag
 
     return (
-      <Tag style={{ position: 'relative' }} ref={ref => this.$ = ref}>
+      <Tag style={{ position: 'relative', ...this.props.style }} ref={ref => this.$ = ref}>
         {this.props.children.map((child, index) => React.cloneElement(child, {
           initCompareCoordinate: () => this.initCompareCoordinate(index),
           'z-key': index + 1,

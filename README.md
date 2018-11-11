@@ -38,4 +38,4 @@ The example will open in browser automatically
     1. - [ ] 组件间辅助线
     2. - [ ] 对齐元素增加className
 - - [x] 初始化及controlled集成
-- - [ ] 基础props补充
+- - [ ] 基础props补充

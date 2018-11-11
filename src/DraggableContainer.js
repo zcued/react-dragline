@@ -44,6 +44,7 @@ export default class DraggableContainer extends React.PureComponent {
     super(props)
 
     this.state = {
+      activeIndex: [],
       vLine: [],
       hLine: [],
     }

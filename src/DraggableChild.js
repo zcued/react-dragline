@@ -8,15 +8,19 @@ import PropTypes from 'prop-types'
 export default class DraggableChild extends React.Component {
   static propTypes = {
     children: PropTypes.element.isRequired,
+    position: PropTypes.object,
   }
 
   static defaultProps = {
-
+    position: {x: 0, y: 0},
   }
 
-  state = {
-    x: 0,
-    y: 0,
+  constructor(props) {
+    super(props)
+    this.state = {
+      x: props.position.x,
+      y: props.position.y,
+    }
   }
 
   componentDidMount() {
@@ -27,25 +31,34 @@ export default class DraggableChild extends React.Component {
 
   }
 
-  handleStart = () => {
+  handleStart = (ev, b) => {
+    this.lastX = b.lastX
+    this.lastY = b.lastY
     this.props.initCompareCoordinate()
   }
 
   handleDrag = (ev, b) => {
-    const dragX = b.deltaX + this.state.x
-    const dragY = b.deltaY + this.state.y
+    const dragX = b.lastX - this.lastX + this.props.position.x
+    const dragY = b.lastY - this.lastY + this.props.position.y
     const {x, y} = this.props.calc(dragX, dragY)
     this.setState({ x, y })
   }
 
   handleStop = () => {
+    const {x, y} = this.state
+    this.props.handleChange({x, y})
     this.props.clear()
   }
 
   render() {
     const { x, y } = this.state
-    const child = this.props.children
-    const style = { ...child.props.style, transform: `translate(${x}px, ${y}px)` }
+    const children = this.props.children
+    const style = {
+      ...children.props.style,
+      position: 'absolute',
+      top: y,
+      left: x,
+    }
 
     return (
       <DraggableCore

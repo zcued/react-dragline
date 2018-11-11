@@ -1,5 +1,4 @@
 const path = require('path')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 
 module.exports = {
@@ -9,7 +8,6 @@ module.exports = {
     filename: 'bundle.js',
   },
   mode: 'production',
-  devtool: 'source-map',
   module: {
     rules: [
       {
@@ -27,9 +25,4 @@ module.exports = {
       },
     ],
   },
-  plugins: [
-    new HtmlWebpackPlugin({
-      filename: 'index.html',
-    }),
-  ],
 }

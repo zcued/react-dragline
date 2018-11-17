@@ -25,11 +25,15 @@ export default class DraggableContainer extends React.PureComponent {
   static propTypes = {
     tag: PropTypes.string,
     style: PropTypes.object,
+    directions: PropTypes.array,
+    threshold: PropTypes.number,
   }
 
   static defaultProps = {
     tag: 'div',
     style: {},
+    directions: ['tt', 'bb', 'll', 'rr', 'tb', 'lr' ],
+    threshold: 5,
   }
 
   constructor(props) {
@@ -52,15 +56,14 @@ export default class DraggableContainer extends React.PureComponent {
 
       return {
         $,
-        x: x,
-        y: y,
-        width: w,
-        height: h,
-        left: x,
-        right: x + w,
-        top: y,
-        bottom: y + h,
-
+        x,
+        y,
+        w,
+        h,
+        l: x,
+        r: x + w,
+        t: y,
+        b: y + h,
         lr: x + w / 2,
         tb: y + h / 2,
       }
@@ -74,8 +77,8 @@ export default class DraggableContainer extends React.PureComponent {
       const compares = this.$children.filter((_, i) => i !== index)
 
       return {
-        x: this.checkIsNearByX(x, compares, target),
-        y: this.checkIsNearByY(y, compares, target),
+        x: this.compareNear(x, compares, target, ['ll', 'rr', 'lr'], 'vLine'),
+        y: this.compareNear(y, compares, target, ['tt', 'bb', 'tb'], 'hLine'),
       }
     }
   }
@@ -84,9 +87,53 @@ export default class DraggableContainer extends React.PureComponent {
     this.setState({vLine: [], hLine: []})
   }
 
-  checkIsNearByX(x, compares, {width}) {
-    // 触发吸附的阈值，TODO加入option中
-    const threshold = 5
+  compareNearSingle(v, dire, {l, r, t, b, lr, tb}, {w, h}) {
+    const result = {
+      near: false,
+      dist: Number.MAX_SAFE_INTEGER,
+      line: 0,
+    }
+
+    if (!this.props.directions.includes(dire)) {
+      return result
+    }
+
+    switch (dire) {
+      case 'lr':
+        result.dist = v + w / 2 - lr
+        result.line = lr
+        break
+      case 'll':
+        result.dist = v - l
+        result.line = l
+        break
+      case 'rr':
+        result.dist = v + w - r
+        result.line = r
+        break
+      case 'tt':
+        result.dist = v - t
+        result.line = t
+        break
+      case 'bb':
+        result.dist = v + h - b
+        result.line = b
+        break
+      case 'tb':
+        result.dist = v + h / 2 - tb
+        result.line = tb
+        break
+    }
+
+    if (Math.abs(result.dist) < this.props.threshold + 1) {
+      result.near = true
+      return result
+    }
+
+    return result
+  }
+
+  compareNear(value, compares, target, direKeys, lineState) {
     /**
      * results: {
      *   3: [345, 500]
@@ -97,70 +144,23 @@ export default class DraggableContainer extends React.PureComponent {
      */
     const results = {}
 
-    // 比较其他元素与当前拖动的元素
-    compares.forEach(({left, right, lr}) => {
-      if (Math.abs(x + width / 2 - lr) < threshold) {
-        const minDistance = x + width / 2 - lr
-        const vLineValue = lr
-        checkArrayWithPush(results, minDistance, vLineValue)
-      }
-
-      if (Math.abs(x - left) < threshold) {
-        const minDistance = x - left
-        const vLineValue = left
-        checkArrayWithPush(results, minDistance, vLineValue)
-      }
-
-      if (Math.abs(x + width - right) < threshold) {
-        const minDistance = x + width - right
-        const vLineValue = right
-        checkArrayWithPush(results, minDistance, vLineValue)
-      }
+    compares.forEach((compare) => {
+      direKeys.forEach(dire => {
+        const {near, dist, line} = this.compareNearSingle(value, dire, compare, target)
+        if (near) {
+          checkArrayWithPush(results, dist, line)
+        }
+      })
     })
 
     const resultArray = Object.entries(results)
     if (resultArray.length) {
-      const [minDistance, vLine] = resultArray.sort(([key1], [key2]) => Math.abs(key1) - Math.abs(key2))[0]
-      this.setState({vLine: unique(vLine)})
-      return x - minDistance
+      const [minDistance, lines] = resultArray.sort(([key1], [key2]) => Math.abs(key1) - Math.abs(key2))[0]
+      this.setState({[lineState]: unique(lines)})
+      return value - minDistance
     } else {
-      this.setState({vLine: []})
-      return x
-    }
-  }
-
-  checkIsNearByY(y, compares, {height}) {
-    const threshold = 5
-    const results = {}
-
-    compares.forEach(({top, bottom, tb}) => {
-      if (Math.abs(y + height / 2 - tb) < threshold) {
-        const minDistance = y + height / 2 - tb
-        const vLineValue = tb
-        checkArrayWithPush(results, minDistance, vLineValue)
-      }
-
-      if (Math.abs(y - top) < threshold) {
-        const minDistance = y - top
-        const hLineValue = top
-        checkArrayWithPush(results, minDistance, hLineValue)
-      }
-
-      if (Math.abs(y + height - bottom) < threshold) {
-        const minDistance = y - bottom + height
-        const hLineValue = bottom
-        checkArrayWithPush(results, minDistance, hLineValue)
-      }
-    })
-
-    const resultArray = Object.entries(results)
-    if (resultArray.length) {
-      const [minDistance, hLine] = resultArray.sort(([key1], [key2]) => Math.abs(key1) - Math.abs(key2))[0]
-      this.setState({hLine: unique(hLine)})
-      return y - minDistance
-    } else {
-      this.setState({hLine: []})
-      return y
+      this.setState({[lineState]: []})
+      return value
     }
   }
 

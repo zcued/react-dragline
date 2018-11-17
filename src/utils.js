@@ -9,4 +9,15 @@ export function unique(array) {
   return res
 }
 
-export default {}
+export const checkArrayWithPush = (target, key, value) => {
+  if (Array.isArray(target[key])) {
+    target[key].push(value)
+  } else {
+    target[key] = [value]
+  }
+}
+
+export default {
+  unique,
+  checkArrayWithPush,
+}

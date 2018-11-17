@@ -2,7 +2,8 @@ import React from 'react'
 // import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-// import { unique } from './utils'
+import { unique, checkArrayWithPush } from './utils'
+
 
 const VLine = styled.span`
   position: absolute;
@@ -19,15 +20,6 @@ const HLine = styled.span`
   height: 1px;
   background: #00FFFF;
 `
-
-// const alignTypes = Object.freeze({
-//   t: 'top',
-//   l: 'left',
-//   b: 'bottom',
-//   r: 'right',
-//   v: 'ver',
-//   h: 'hor',
-// })
 
 export default class DraggableContainer extends React.PureComponent {
   static propTypes = {
@@ -54,21 +46,28 @@ export default class DraggableContainer extends React.PureComponent {
   initCompareCoordinate = () => {
     this.$children = this.props.children.map(({props}, i) => {
       const $ = this.$.childNodes[i]
+      const {x, y} = props.position
+      const w = $.clientWidth
+      const h = $.clientHeight
 
       return {
         $,
-        x: props.position.x,
-        y: props.position.y,
-        width: $.clientWidth,
-        height: $.clientHeight,
-        left: props.position.x,
-        right: props.position.x + $.clientWidth,
-        top: props.position.y,
-        bottom: props.position.y + $.clientHeight,
+        x: x,
+        y: y,
+        width: w,
+        height: h,
+        left: x,
+        right: x + w,
+        top: y,
+        bottom: y + h,
+
+        lr: x + w / 2,
+        tb: y + h / 2,
       }
     })
   }
 
+  // 拖动中计算是否吸附/显示辅助线
   calc = (index) => {
     return (x, y) => {
       const target = this.$children[index]
@@ -86,23 +85,43 @@ export default class DraggableContainer extends React.PureComponent {
   }
 
   checkIsNearByX(x, compares, {width}) {
-    let minDistance = 99999
-    let vLineValue = 0
+    // 触发吸附的阈值，TODO加入option中
+    const threshold = 5
+    /**
+     * results: {
+     *   3: [345, 500]
+     * }
+     * key: 距离需要对齐的坐标3px
+     * value: 需要显示辅助线数组（可能存在对条，例：大小完全相同的元素左中右同时对齐）
+     * TODO: option => 多边对齐是否显示多条
+     */
+    const results = {}
 
-    compares.forEach(({left, right}) => {
-      if (Math.abs(x - left) < Math.abs(minDistance)) {
-        minDistance = x - left
-        vLineValue = left
+    // 比较其他元素与当前拖动的元素
+    compares.forEach(({left, right, lr}) => {
+      if (Math.abs(x + width / 2 - lr) < threshold) {
+        const minDistance = x + width / 2 - lr
+        const vLineValue = lr
+        checkArrayWithPush(results, minDistance, vLineValue)
       }
 
-      if (Math.abs(x + width - right) < Math.abs(minDistance)) {
-        minDistance = x - right + width
-        vLineValue = right
+      if (Math.abs(x - left) < threshold) {
+        const minDistance = x - left
+        const vLineValue = left
+        checkArrayWithPush(results, minDistance, vLineValue)
+      }
+
+      if (Math.abs(x + width - right) < threshold) {
+        const minDistance = x + width - right
+        const vLineValue = right
+        checkArrayWithPush(results, minDistance, vLineValue)
       }
     })
 
-    if (Math.abs(minDistance) < 5) {
-      this.setState({vLine: [vLineValue]})
+    const resultArray = Object.entries(results)
+    if (resultArray.length) {
+      const [minDistance, vLine] = resultArray.sort(([key1], [key2]) => Math.abs(key1) - Math.abs(key2))[0]
+      this.setState({vLine: unique(vLine)})
       return x - minDistance
     } else {
       this.setState({vLine: []})
@@ -111,23 +130,33 @@ export default class DraggableContainer extends React.PureComponent {
   }
 
   checkIsNearByY(y, compares, {height}) {
-    let minDistance = 99999
-    let hLineValue = 0
+    const threshold = 5
+    const results = {}
 
-    compares.forEach(({top, bottom}) => {
-      if (Math.abs(y - top) < Math.abs(minDistance)) {
-        minDistance = y - top
-        hLineValue = top
+    compares.forEach(({top, bottom, tb}) => {
+      if (Math.abs(y + height / 2 - tb) < threshold) {
+        const minDistance = y + height / 2 - tb
+        const vLineValue = tb
+        checkArrayWithPush(results, minDistance, vLineValue)
       }
 
-      if (Math.abs(y + height - bottom) < Math.abs(minDistance)) {
-        minDistance = y - bottom + height
-        hLineValue = bottom
+      if (Math.abs(y - top) < threshold) {
+        const minDistance = y - top
+        const hLineValue = top
+        checkArrayWithPush(results, minDistance, hLineValue)
+      }
+
+      if (Math.abs(y + height - bottom) < threshold) {
+        const minDistance = y - bottom + height
+        const hLineValue = bottom
+        checkArrayWithPush(results, minDistance, hLineValue)
       }
     })
 
-    if (Math.abs(minDistance) < 5) {
-      this.setState({hLine: [hLineValue]})
+    const resultArray = Object.entries(results)
+    if (resultArray.length) {
+      const [minDistance, hLine] = resultArray.sort(([key1], [key2]) => Math.abs(key1) - Math.abs(key2))[0]
+      this.setState({hLine: unique(hLine)})
       return y - minDistance
     } else {
       this.setState({hLine: []})

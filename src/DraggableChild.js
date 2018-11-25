@@ -1,9 +1,8 @@
 import React from 'react'
-// import ReactDom from 'react-dom'
 import { DraggableCore } from 'react-draggable'
 import PropTypes from 'prop-types'
+import classNames from 'classnames'
 
-// const noop = () => {}
 
 export default class DraggableChild extends React.Component {
   static propTypes = {
@@ -23,42 +22,38 @@ export default class DraggableChild extends React.Component {
     }
   }
 
-  componentDidMount() {
-
-  }
-
-  componentWillUnmount() {
-
-  }
-
   handleStart = (ev, b) => {
     this.lastX = b.lastX
     this.lastY = b.lastY
-    this.props.initCompareCoordinate()
+    this.props.onStart()
   }
 
   handleDrag = (ev, b) => {
     const dragX = b.lastX - this.lastX + this.props.position.x
     const dragY = b.lastY - this.lastY + this.props.position.y
-    const {x, y} = this.props.calc(dragX, dragY)
+    const {x, y} = this.props.onDrag(dragX, dragY)
     this.setState({ x, y })
   }
 
   handleStop = () => {
     const {x, y} = this.state
     this.props.handleChange({x, y})
-    this.props.clear()
+    this.props.onStop()
   }
 
   render() {
     const { x, y } = this.state
-    const children = this.props.children
+    const {active, children, activeClassName} = this.props
     const style = {
       ...children.props.style,
       position: 'absolute',
       top: y,
       left: x,
     }
+
+    const className = classNames(children.props.className, {
+      [activeClassName]: active,
+    })
 
     return (
       <DraggableCore
@@ -68,7 +63,7 @@ export default class DraggableChild extends React.Component {
         onStart={this.handleStart}
         position={{ x, y }}
       >
-        {React.cloneElement(this.props.children, { style, 'data-z-key': this.props['z-key'] })}
+        {React.cloneElement(this.props.children, { style, className })}
       </DraggableCore>
     )
   }

@@ -1,12 +1,12 @@
-export function unique(array) {
-  const res = []
+export function unique(array, compare = (a, b) => a === b) {
+  const result = []
   for (let i = 0, len = array.length; i < len; i++) {
     const current = array[i]
-    if (res.indexOf(current) === -1) {
-      res.push(current)
+    if (result.findIndex(v => compare(v, current)) === -1) {
+      result.push(current)
     }
   }
-  return res
+  return result
 }
 
 export const checkArrayWithPush = (target, key, value) => {

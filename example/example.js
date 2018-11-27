@@ -38,11 +38,12 @@ class Example extends React.Component {
               flexDirection: 'column',
               justifyContent: 'center',
               alignItems: 'center',
+              cursor: 'move',
             }
 
             return (
               <DraggableChild key={id} position={position} handleChange={position => this.handleChange(index, position)}>
-                <div style={style}>
+                <div className="item" style={style}>
                   <span>size: {size}</span>
                   <span>drag me</span>
                 </div>

@@ -1,5 +1,4 @@
 import React from 'react'
-// import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { unique, checkArrayWithPush } from './utils'
@@ -7,47 +6,58 @@ import { unique, checkArrayWithPush } from './utils'
 
 const VLine = styled.span`
   position: absolute;
-  top: 0;
   width: 1px;
-  height: 100%;
-  background: #00FFFF;
+  background: ${props => props.color};
 `
 
 const HLine = styled.span`
   position: absolute;
-  left: 0;
-  width: 100%;
   height: 1px;
-  background: #00FFFF;
+  background: ${props => props.color};
 `
 
 export default class DraggableContainer extends React.PureComponent {
   static propTypes = {
-    tag: PropTypes.string,
+    Container: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.element,
+    ]),
     style: PropTypes.object,
     directions: PropTypes.array,
     threshold: PropTypes.number,
+    className: PropTypes.string,
+    activeClassName: PropTypes.string,
+    color: PropTypes.string,
   }
 
   static defaultProps = {
-    tag: 'div',
+    Container: 'div',
     style: {},
     directions: ['tt', 'bb', 'll', 'rr', 'tb', 'lr' ],
     threshold: 5,
+    className: '',
+    activeClassName: 'active',
+    color: '#FF00CC',
   }
 
   constructor(props) {
     super(props)
 
     this.state = {
-      activeIndex: [],
+      vIndices: [],
+      hIndices: [],
       vLine: [],
       hLine: [],
+      static: false,
     }
   }
 
+  componentDidMount() {
+    this.checkContainerPosition()
+  }
+
   // 拖拽初始时 计算出所有元素的坐标信息，存储于this.$children
-  initCompareCoordinate = () => {
+  initChildrenCoordinate = () => {
     this.$children = this.props.children.map(({props}, i) => {
       const $ = this.$.childNodes[i]
       const {x, y} = props.position
@@ -56,6 +66,7 @@ export default class DraggableContainer extends React.PureComponent {
 
       return {
         $,
+        i,
         x,
         y,
         w,
@@ -71,27 +82,79 @@ export default class DraggableContainer extends React.PureComponent {
   }
 
   // 拖动中计算是否吸附/显示辅助线
-  calc = (index) => {
+  calcNewPosition = (index) => {
     return (x, y) => {
       const target = this.$children[index]
       const compares = this.$children.filter((_, i) => i !== index)
 
       return {
-        x: this.compareNear(x, compares, target, ['ll', 'rr', 'lr'], 'vLine'),
-        y: this.compareNear(y, compares, target, ['tt', 'bb', 'tb'], 'hLine'),
+        x: this.compareNear({x, y}, compares, target, 'x'),
+        y: this.compareNear({x, y}, compares, target, 'y'),
       }
     }
   }
 
-  clear = () => {
-    this.setState({vLine: [], hLine: []})
+  resetDragState = () => {
+    this.setState({vLine: [], hLine: [], vIndices: [], hIndices: []})
   }
 
-  compareNearSingle(v, dire, {l, r, t, b, lr, tb}, {w, h}) {
+  getMaxDistance = (arr) => {
+    const num = arr.sort((a, b) => a - b)
+    return num[num.length - 1] - num[0]
+  }
+
+  // 检查容器是否有定位属性
+  checkContainerPosition() {
+    const position = window.getComputedStyle(this.$, null).getPropertyValue('position')
+    if (position === 'static') {
+      this.setState({static: true})
+    }
+  }
+
+  parseStyle() {
+    return this.state.static
+      ? {...this.props.style, position: 'relative'}
+      : this.props.style
+  }
+
+  /**
+   * lowerCase => compare
+   * upperCase => target
+   */
+  compareNearSingle({x, y}, dire, {l, r, t, b, lr, tb}, target, key) {
+    const
+      $ = target.$,
+      W = target.w,
+      H = target.h,
+
+      // T = y,
+      // B = y + H,
+      // L = x,
+      // R = x + W
+
+      // optimize: x, y 为拖拽预期值，并非真实坐标。依据x,y计算辅助线的长度，在xy辅助线交汇时会有一定的偏差、
+      T = $.offsetTop,
+      B = $.offsetTop + H,
+      L = $.offsetLeft,
+      R = $.offsetLeft + W
+
+
+    const paramsForLine = {
+      x: [t, b, T, B],
+      y: [l, r, L, R],
+    }
+
     const result = {
+      // 距离是否达到吸附阈值
       near: false,
+      // 距离差
       dist: Number.MAX_SAFE_INTEGER,
-      line: 0,
+      // 辅助线坐标
+      value: 0,
+      // 辅助线长度
+      length: this.getMaxDistance(paramsForLine[key]),
+      // 辅助线起始坐标（对应绝对定位的top/left）
+      origin: Math.min(...paramsForLine[key]),
     }
 
     if (!this.props.directions.includes(dire)) {
@@ -100,28 +163,28 @@ export default class DraggableContainer extends React.PureComponent {
 
     switch (dire) {
       case 'lr':
-        result.dist = v + w / 2 - lr
-        result.line = lr
+        result.dist = x + W / 2 - lr
+        result.value = lr
         break
       case 'll':
-        result.dist = v - l
-        result.line = l
+        result.dist = x - l
+        result.value = l
         break
       case 'rr':
-        result.dist = v + w - r
-        result.line = r
+        result.dist = x + W - r
+        result.value = r
         break
       case 'tt':
-        result.dist = v - t
-        result.line = t
+        result.dist = y - t
+        result.value = t
         break
       case 'bb':
-        result.dist = v + h - b
-        result.line = b
+        result.dist = y + H - b
+        result.value = b
         break
       case 'tb':
-        result.dist = v + h / 2 - tb
-        result.line = tb
+        result.dist = y + H / 2 - tb
+        result.value = tb
         break
     }
 
@@ -133,61 +196,95 @@ export default class DraggableContainer extends React.PureComponent {
     return result
   }
 
-  compareNear(value, compares, target, direKeys, lineState) {
+  compareNear(values, compares, target, key) {
+    const diffs = {
+      lineState: {
+        x: 'vLine',
+        y: 'hLine',
+      },
+      indices: {
+        x: 'vIndices',
+        y: 'hIndices',
+      },
+      directions: {
+        x: ['ll', 'rr', 'lr'],
+        y: ['tt', 'bb', 'tb'],
+      },
+    }
+
+    const lineState = diffs.lineState[key]
+    const directions = diffs.directions[key]
+    const indices = diffs.indices[key]
+
     /**
      * results: {
-     *   3: [345, 500]
+     *   distance1: [{i, value, origin, length}],
+     *   distance2: [{i, value, origin, length}],
      * }
-     * key: 距离需要对齐的坐标3px
-     * value: 需要显示辅助线数组（可能存在对条，例：大小完全相同的元素左中右同时对齐）
-     * TODO: option => 多边对齐是否显示多条
+     * distance: 与需要显示辅助线坐标的距离
      */
     const results = {}
 
     compares.forEach((compare) => {
-      direKeys.forEach(dire => {
-        const {near, dist, line} = this.compareNearSingle(value, dire, compare, target)
+      directions.forEach(dire => {
+        const {near, dist, value, origin, length} = this.compareNearSingle(values, dire, compare, target, key)
         if (near) {
-          checkArrayWithPush(results, dist, line)
+          checkArrayWithPush(results, dist, {i: compare.i, value, origin, length})
         }
       })
     })
 
     const resultArray = Object.entries(results)
     if (resultArray.length) {
-      const [minDistance, lines] = resultArray.sort(([key1], [key2]) => Math.abs(key1) - Math.abs(key2))[0]
-      this.setState({[lineState]: unique(lines)})
-      return value - minDistance
+      // 多个元素符合阈值时， 排序 => 取最小
+      const [minDistance, lines] = resultArray.sort(([dist1], [dist2]) => Math.abs(dist1) - Math.abs(dist2))[0]
+      this.setState({
+        [lineState]: unique(lines, (a, b) => a.value === b.value),
+        [indices]: unique(lines.map(({i}) => i)),
+      })
+      return values[key] - minDistance
     } else {
-      this.setState({[lineState]: []})
-      return value
+      this.setState({
+        [lineState]: [],
+        [indices]: [],
+      })
+      return values[key]
     }
   }
 
   _renderGuideLine() {
     const { vLine, hLine } = this.state
-
     return (
       <React.Fragment>
-        {vLine.map(v => <VLine key={`v-${v}`} style={{ left: v }} />)}
-        {hLine.map(h => <HLine key={`h-${h}`} style={{ top: h }} />)}
+        {vLine.map(({length, value, origin}, i) => <VLine
+          key={`v-${i}`}
+          style={{ left: value, top: origin, height: length }}
+          color={this.props.color}
+        />)}
+        {hLine.map(({length, value, origin}, i) => <HLine
+          key={`h-${i}`}
+          style={{ top: value, left: origin, width: length }}
+          color={this.props.color}
+        />)
+        }
       </React.Fragment>
     )
   }
 
   render() {
-    const Tag = this.props.tag
-
+    const { Container, activeClassName } = this.props
+    const { vIndices, hIndices } = this.state
     return (
-      <Tag style={{ position: 'relative', ...this.props.style }} ref={ref => this.$ = ref}>
+      <Container style={this.parseStyle()} ref={ref => this.$ = ref}>
         {this.props.children.map((child, index) => React.cloneElement(child, {
-          initCompareCoordinate: () => this.initCompareCoordinate(index),
-          'z-key': index + 1,
-          calc: this.calc(index),
-          clear: this.clear,
+          onStart: this.initChildrenCoordinate,
+          onDrag: this.calcNewPosition(index),
+          onStop: this.resetDragState,
+          active: vIndices.concat(hIndices).includes(index),
+          activeClassName,
         }))}
         {this._renderGuideLine()}
-      </Tag>
+      </Container>
     )
   }
 }

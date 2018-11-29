@@ -17,6 +17,8 @@ const HLine = styled.span`
 `
 
 export default class DraggableContainer extends React.PureComponent {
+  $ = null // container HTMLElement
+
   static propTypes = {
     Container: PropTypes.oneOfType([
       PropTypes.string,
@@ -28,6 +30,7 @@ export default class DraggableContainer extends React.PureComponent {
     className: PropTypes.string,
     activeClassName: PropTypes.string,
     color: PropTypes.string,
+    limit: PropTypes.bool,
   }
 
   static defaultProps = {
@@ -38,6 +41,7 @@ export default class DraggableContainer extends React.PureComponent {
     className: '',
     activeClassName: 'active',
     color: '#FF00CC',
+    limit: true,
   }
 
   constructor(props) {
@@ -87,6 +91,12 @@ export default class DraggableContainer extends React.PureComponent {
       const target = this.$children[index]
       const compares = this.$children.filter((_, i) => i !== index)
 
+      if (this.props.limit) {
+        const {limitX, limitY} = this.checkDragOut({x, y}, target)
+        x = limitX
+        y = limitY
+      }
+
       return {
         x: this.compareNear({x, y}, compares, target, 'x'),
         y: this.compareNear({x, y}, compares, target, 'y'),
@@ -101,6 +111,28 @@ export default class DraggableContainer extends React.PureComponent {
   getMaxDistance = (arr) => {
     const num = arr.sort((a, b) => a - b)
     return num[num.length - 1] - num[0]
+  }
+
+  // 检查是否拖出容器
+  checkDragOut({x, y}, target) {
+    const maxLeft = this.$.clientWidth - target.w
+    const maxTop = this.$.clientHeight - target.h
+    let limitX = x
+    let limitY = y
+
+    if (x < 0) {
+      limitX = 0
+    } else if (x > maxLeft) {
+      limitX = maxLeft
+    }
+
+    if (y < 0) {
+      limitY = 0
+    } if (y > maxTop) {
+      limitY = maxTop
+    }
+
+    return {limitX, limitY}
   }
 
   // 检查容器是否有定位属性

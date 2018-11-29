@@ -6,8 +6,8 @@
   "scripts": {
     "clean": "rimraf dist",
     "start": "NODE_ENV=dev webpack-dev-server --progress --color --config build --hot",
-    "build": "npm run clean && NODE_ENV=prod webpack --config build",
-    "example": "NODE_ENV=example webpack --config build",
+    "build": "npm run clean && NODE_ENV=prod webpack --progress --config build",
+    "example": "NODE_ENV=example webpack --progress --config build",
     "lint": "eslint ./src",
     "test": "mocha --require @babel/register --require ./test/setup.js --require ignore-styles --recursive ./test"
   },
@@ -60,6 +60,7 @@
     "webpack-dev-server": "^3.1.4"
   },
   "dependencies": {
+    "@babel/polyfill": "^7.0.0",
     "classnames": "^2.2.6",
     "react-draggable": "^2.2.6",
     "styled-components": "^3.3.2"

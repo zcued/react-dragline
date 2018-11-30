@@ -1,1 +1,1 @@
-module.exports = require(`./webpack.${process.env.NODE_ENV}.js`)
+module.exports = require(`./webpack.config.${process.env.NODE_ENV}.js`)

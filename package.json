@@ -1,13 +1,20 @@
 {
   "name": "react-drag-guideline",
-  "version": "0.0.1",
-  "description": "Guide lines to better align draggable children in React.",
-  "main": "index.js",
+  "version": "0.0.6",
+  "description": "Guide lines to better align draggable children in React",
+  "main": "lib/index.js",
   "scripts": {
-    "clean": "rimraf dist",
     "start": "NODE_ENV=dev webpack-dev-server --progress --color --config build --hot",
-    "build": "npm run clean && NODE_ENV=prod webpack --progress --config build",
-    "example": "NODE_ENV=example webpack --progress --config build",
+
+    "build": "npm run build:umd && npm run build:cjs",
+    "build:umd": "npm run clean:umd && NODE_ENV=umd webpack --progress --config build && NODE_ENV=umd webpack --progress --config build --minify",
+    "build:cjs": "npm run clean:cjs && babel src --out-dir lib",
+
+    "build:docs": "NODE_ENV=docs webpack --progress --config build",
+
+    "clean:umd": "rimraf dist",
+    "clean:cjs": "rimraf lib",
+
     "lint": "eslint ./src",
     "test": "mocha --require @babel/register --require ./test/setup.js --require ignore-styles --recursive ./test"
   },
@@ -25,24 +32,26 @@
     "react-drag-guideline",
     "react-drag-ref-line"
   ],
-  "author": "zcued",
+  "author": "huangdehao",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/zcued/react-drag-guideline/issues"
   },
   "homepage": "https://github.com/zcued/react-drag-guideline#readme",
   "devDependencies": {
-    "@babel/core": "^7.0.0-beta.44",
-    "@babel/register": "^7.0.0-beta.44",
-    "@babel/runtime": "^7.0.0-beta.44",
+    "@babel/cli": "^7.1.5",
+    "@babel/core": "^7.1.6",
+    "@babel/register": "^7.0.0",
+    "@babel/runtime": "^7.1.5",
     "babel-eslint": "^8.2.2",
-    "babel-loader": "^8.0.0-beta.0",
+    "babel-loader": "^8.0.4",
     "babel-preset-next": "^1.1.3",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "enzyme": "^3.3.0",
     "enzyme-adapter-react-16": "^1.1.1",
     "eslint": "^4.19.1",
+    "eslint-config-zcool": "^1.4.0",
     "eslint-loader": "^2.0.0",
     "eslint-plugin-import": "^2.10.0",
     "eslint-plugin-jsx-a11y": "^6.0.3",
@@ -58,12 +67,19 @@
     "webpack": "^4.12.0",
     "webpack-bundle-analyzer": "^3.0.3",
     "webpack-cli": "^3.0.3",
-    "webpack-dev-server": "^3.1.4"
+    "webpack-dev-server": "^3.1.4",
+    "yargs": "^12.0.5"
   },
   "dependencies": {
     "@babel/polyfill": "^7.0.0",
     "classnames": "^2.2.6",
+    "prop-types": "^15.6.2",
     "react-draggable": "^2.2.6",
+    "react-sortable-hoc": "^0.8.4",
     "styled-components": "^3.3.2"
+  },
+  "peerDependencies": {
+    "react": "^15.3.0 || ^16.0.2",
+    "react-dom": "^15.3.0 || ^16.0.2"
   }
 }

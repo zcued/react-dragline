@@ -1,33 +1,37 @@
-import React from 'react'
-import ReactDOM from 'react-dom'
-import update from 'immutability-helper'
-import { DraggableContainer, DraggableChild } from '../src/index'
-
-
 const initialChildren = [
-  { id: 1, background: '#0000FF', size: 100, position: {x: 100, y: 0} },
-  { id: 2, background: '#0000FF', size: 100, position: {x: 200, y: 106} },
-  { id: 3, background: '#00FF99', size: 102, position: {x: 500, y: 106} },
-  { id: 4, background: '#333366', size: 150, position: {x: 100, y: 316} },
-  { id: 5, background: '#CC66FF', size: 200, position: {x: 480, y: 376} },
+  { id: 1, background: '#8ce8df', size: 100, position: {x: 100, y: 0} },
+  { id: 2, background: '#8ce8df', size: 100, position: {x: 200, y: 106} },
+  { id: 3, background: '#afc7fd', size: 102, position: {x: 500, y: 106} },
+  { id: 4, background: '#d2aff6', size: 150, position: {x: 100, y: 316} },
+  { id: 5, background: '#fee493', size: 200, position: {x: 480, y: 376} },
 ]
 
 class Example extends React.Component {
-  state = {
-    children: initialChildren,
+  constructor(props) {
+    super(props)
+    this.state = {
+      children: initialChildren,
+    }
   }
 
-  handleChange = (index, position) => {
-    const children = update(this.state.children, {
-      [index]: {position: {$set: position}},
-    })
+  handleChange(index, position){
+    const child = Object.assign(this.state.children[index], {position})
+    const children = Object.assign([], this.state.children, {[index]: child})
 
     this.setState({children})
   }
 
   render() {
+    const containerStyle = {
+      height: 600,
+      boxShadow: '0 0 5px 1px #CCC inset',
+      background: '#F5F8FA',
+      color: '#4A4A4A',
+      margin: 20,
+    }
+
     return (
-      <DraggableContainer style={{height: 600, border: '1px solid #ddd'}}>
+      <DraggableContainer style={containerStyle}>
         {
           this.state.children.map(({ id, background, size, position }, index) => {
             const style = {

@@ -2,12 +2,12 @@ const path = require('path')
 
 
 module.exports = {
-  entry: './example/example.js',
+  entry: path.resolve('./index.js'),
   output: {
-    path: path.resolve('./docs'),
     filename: 'bundle.js',
   },
-  mode: 'production',
+  mode: 'development',
+  devtool: 'source-map',
   module: {
     rules: [
       {
@@ -24,5 +24,9 @@ module.exports = {
         ],
       },
     ],
+  },
+  devServer: {
+    port: '8013',
+    open: true,
   },
 }

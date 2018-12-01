@@ -258,7 +258,7 @@ export default class DraggableContainer extends React.PureComponent {
       // 多个元素符合阈值时， 排序 => 取最小
       const [minDistance, lines] = resultArray.sort(([dist1], [dist2]) => Math.abs(dist1) - Math.abs(dist2))[0]
       this.setState({
-        [lineState]: unique(lines, (a, b) => a.value === b.value),
+        [lineState]: lines,
         [indices]: unique(lines.map(({i}) => i)),
       })
       return values[key] - minDistance

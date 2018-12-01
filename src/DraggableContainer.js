@@ -1,20 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import styled from 'styled-components'
 import { unique, checkArrayWithPush } from './utils'
 
-
-const VLine = styled.span`
-  position: absolute;
-  width: 1px;
-  background: ${props => props.color};
-`
-
-const HLine = styled.span`
-  position: absolute;
-  height: 1px;
-  background: ${props => props.color};
-`
 
 export default class DraggableContainer extends React.PureComponent {
   $ = null // container HTMLElement
@@ -29,8 +16,8 @@ export default class DraggableContainer extends React.PureComponent {
     threshold: PropTypes.number,
     className: PropTypes.string,
     activeClassName: PropTypes.string,
-    color: PropTypes.string,
     limit: PropTypes.bool,
+    lineStyle: PropTypes.object,
   }
 
   static defaultProps = {
@@ -40,8 +27,8 @@ export default class DraggableContainer extends React.PureComponent {
     threshold: 5,
     className: '',
     activeClassName: 'active',
-    color: '#FF00CC',
     limit: true,
+    lineStyle: {},
   }
 
   constructor(props) {
@@ -286,19 +273,27 @@ export default class DraggableContainer extends React.PureComponent {
 
   _renderGuideLine() {
     const { vLine, hLine } = this.state
+    const { lineStyle } = this.props
+    const commonStyle = {
+      position: 'absolute',
+      backgroundColor: '#FF00CC',
+      ...lineStyle,
+    }
+
     return (
       <React.Fragment>
-        {vLine.map(({length, value, origin}, i) => <VLine
-          key={`v-${i}`}
-          style={{ left: value, top: origin, height: length }}
-          color={this.props.color}
-        />)}
-        {hLine.map(({length, value, origin}, i) => <HLine
-          key={`h-${i}`}
-          style={{ top: value, left: origin, width: length }}
-          color={this.props.color}
-        />)
-        }
+        {vLine.map(({length, value, origin}, i) => (
+          <span
+            key={`v-${i}`}
+            style={{ left: value, top: origin, height: length, width: 1, ...commonStyle }}
+          />
+        ))}
+        {hLine.map(({length, value, origin}, i) => (
+          <span
+            key={`h-${i}`}
+            style={{ top: value, left: origin, width: length, height: 1, ...commonStyle }}
+          />
+        ))}
       </React.Fragment>
     )
   }

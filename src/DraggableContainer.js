@@ -1,22 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import styled from 'styled-components'
 import { unique, checkArrayWithPush } from './utils'
 
 
-const VLine = styled.span`
-  position: absolute;
-  width: 1px;
-  background: ${props => props.color};
-`
-
-const HLine = styled.span`
-  position: absolute;
-  height: 1px;
-  background: ${props => props.color};
-`
-
 export default class DraggableContainer extends React.PureComponent {
+  $ = null // container HTMLElement
+
   static propTypes = {
     Container: PropTypes.oneOfType([
       PropTypes.string,
@@ -27,7 +16,8 @@ export default class DraggableContainer extends React.PureComponent {
     threshold: PropTypes.number,
     className: PropTypes.string,
     activeClassName: PropTypes.string,
-    color: PropTypes.string,
+    limit: PropTypes.bool,
+    lineStyle: PropTypes.object,
   }
 
   static defaultProps = {
@@ -37,7 +27,8 @@ export default class DraggableContainer extends React.PureComponent {
     threshold: 5,
     className: '',
     activeClassName: 'active',
-    color: '#FF00CC',
+    limit: true,
+    lineStyle: {},
   }
 
   constructor(props) {
@@ -87,6 +78,12 @@ export default class DraggableContainer extends React.PureComponent {
       const target = this.$children[index]
       const compares = this.$children.filter((_, i) => i !== index)
 
+      if (this.props.limit) {
+        const {limitX, limitY} = this.checkDragOut({x, y}, target)
+        x = limitX
+        y = limitY
+      }
+
       return {
         x: this.compareNear({x, y}, compares, target, 'x'),
         y: this.compareNear({x, y}, compares, target, 'y'),
@@ -101,6 +98,28 @@ export default class DraggableContainer extends React.PureComponent {
   getMaxDistance = (arr) => {
     const num = arr.sort((a, b) => a - b)
     return num[num.length - 1] - num[0]
+  }
+
+  // 检查是否拖出容器
+  checkDragOut({x, y}, target) {
+    const maxLeft = this.$.clientWidth - target.w
+    const maxTop = this.$.clientHeight - target.h
+    let limitX = x
+    let limitY = y
+
+    if (x < 0) {
+      limitX = 0
+    } else if (x > maxLeft) {
+      limitX = maxLeft
+    }
+
+    if (y < 0) {
+      limitY = 0
+    } if (y > maxTop) {
+      limitY = maxTop
+    }
+
+    return {limitX, limitY}
   }
 
   // 检查容器是否有定位属性
@@ -239,7 +258,7 @@ export default class DraggableContainer extends React.PureComponent {
       // 多个元素符合阈值时， 排序 => 取最小
       const [minDistance, lines] = resultArray.sort(([dist1], [dist2]) => Math.abs(dist1) - Math.abs(dist2))[0]
       this.setState({
-        [lineState]: unique(lines, (a, b) => a.value === b.value),
+        [lineState]: lines,
         [indices]: unique(lines.map(({i}) => i)),
       })
       return values[key] - minDistance
@@ -254,19 +273,27 @@ export default class DraggableContainer extends React.PureComponent {
 
   _renderGuideLine() {
     const { vLine, hLine } = this.state
+    const { lineStyle } = this.props
+    const commonStyle = {
+      position: 'absolute',
+      backgroundColor: '#FF00CC',
+      ...lineStyle,
+    }
+
     return (
       <React.Fragment>
-        {vLine.map(({length, value, origin}, i) => <VLine
-          key={`v-${i}`}
-          style={{ left: value, top: origin, height: length }}
-          color={this.props.color}
-        />)}
-        {hLine.map(({length, value, origin}, i) => <HLine
-          key={`h-${i}`}
-          style={{ top: value, left: origin, width: length }}
-          color={this.props.color}
-        />)
-        }
+        {vLine.map(({length, value, origin}, i) => (
+          <span
+            key={`v-${i}`}
+            style={{ left: value, top: origin, height: length, width: 1, ...commonStyle }}
+          />
+        ))}
+        {hLine.map(({length, value, origin}, i) => (
+          <span
+            key={`h-${i}`}
+            style={{ top: value, left: origin, width: length, height: 1, ...commonStyle }}
+          />
+        ))}
       </React.Fragment>
     )
   }

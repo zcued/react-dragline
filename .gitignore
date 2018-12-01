@@ -64,5 +64,5 @@ typings/
 # next.js build output
 .next
 
-# debug file
-server.js
+# library
+lib

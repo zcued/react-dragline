@@ -1,0 +1,9 @@
+**/.*
+example
+src
+index.js
+server.js
+test
+docs
+build
+package-lock.json

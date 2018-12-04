@@ -126,6 +126,9 @@ export default class DraggableContainer extends React.PureComponent {
   checkContainerPosition() {
     const position = window.getComputedStyle(this.$, null).getPropertyValue('position')
     if (position === 'static') {
+      console.error(
+        'Warning: The `position` attribute of container is `static`! It may cause an error if you render in server-side.',
+      )
       this.setState({static: true})
     }
   }

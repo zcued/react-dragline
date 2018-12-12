@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { unique, checkArrayWithPush } from './utils'
 
 
-export default class DraggableContainer extends React.PureComponent {
+export default class DraggableContainer extends React.Component {
   $ = null // container HTMLElement
 
   static propTypes = {
@@ -283,8 +283,11 @@ export default class DraggableContainer extends React.PureComponent {
       ...lineStyle,
     }
 
+    // support react 15
+    const Container = React.Fragment || 'div'
+
     return (
-      <React.Fragment>
+      <Container>
         {vLine.map(({length, value, origin}, i) => (
           <span
             key={`v-${i}`}
@@ -297,7 +300,7 @@ export default class DraggableContainer extends React.PureComponent {
             style={{ top: value, left: origin, width: length, height: 1, ...commonStyle }}
           />
         ))}
-      </React.Fragment>
+      </Container>
     )
   }
 

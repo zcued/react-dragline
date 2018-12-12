@@ -26,6 +26,7 @@ class Example extends React.Component {
 
   render() {
     const containerStyle = {
+      position: 'relative',
       height: 600,
       boxShadow: '0 0 5px 1px #CCC inset',
       background: '#F5F8FA',

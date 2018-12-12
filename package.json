@@ -1,6 +1,6 @@
 {
   "name": "react-drag-guideline",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Guide lines to better align draggable children in React",
   "main": "lib/index.js",
   "scripts": {

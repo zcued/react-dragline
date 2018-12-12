@@ -73,7 +73,7 @@
     "react-draggable": "^2.2.6"
   },
   "peerDependencies": {
-    "react": "^15.3.0 || ^16.0.2",
-    "react-dom": "^15.3.0 || ^16.0.2"
+    "react": "^15.3.0 || ^16.0.0",
+    "react-dom": "^15.3.0 || ^16.0.0"
   }
 }

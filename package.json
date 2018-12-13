@@ -1,6 +1,6 @@
 {
   "name": "react-drag-guideline",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Guide lines to better align draggable children in React",
   "main": "lib/index.js",
   "scripts": {
@@ -73,7 +73,7 @@
     "react-draggable": "^2.2.6"
   },
   "peerDependencies": {
-    "react": "^15.3.0 || ^16.0.2",
-    "react-dom": "^15.3.0 || ^16.0.2"
+    "react": "^15.3.0 || ^16.0.0",
+    "react-dom": "^15.3.0 || ^16.0.0"
   }
 }

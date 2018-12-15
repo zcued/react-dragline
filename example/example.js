@@ -14,13 +14,6 @@ class Example extends React.Component {
     }
   }
 
-  handleChange(index, position){
-    const child = Object.assign(this.state.children[index], {position})
-    const children = Object.assign([], this.state.children, {[index]: child})
-
-    this.setState({children})
-  }
-
   render() {
     const containerStyle = {
       height: 600,
@@ -28,6 +21,7 @@ class Example extends React.Component {
       background: '#F5F8FA',
       color: '#4A4A4A',
       margin: 20,
+      position: 'relative',
     }
 
     return (
@@ -46,7 +40,7 @@ class Example extends React.Component {
             }
 
             return (
-              <DraggableChild key={id} position={position} handleChange={position => this.handleChange(index, position)}>
+              <DraggableChild key={id} defaultPosition={position}>
                 <div className="item" style={style}>
                   <span>size: {size}</span>
                   <span>drag me</span>

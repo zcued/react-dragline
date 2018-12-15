@@ -49,9 +49,10 @@ export default class DraggableContainer extends React.Component {
 
   // 拖拽初始时 计算出所有元素的坐标信息，存储于this.$children
   initChildrenCoordinate = () => {
-    this.$children = this.props.children.map(({props}, i) => {
+    this.$children = this.props.children.map((child, i) => {
       const $ = this.$.childNodes[i]
-      const {x, y} = props.position
+      const x = Number($.getAttribute('data-x'))
+      const y = Number($.getAttribute('data-y'))
       const w = $.clientWidth
       const h = $.clientHeight
 
@@ -310,9 +311,9 @@ export default class DraggableContainer extends React.Component {
     return (
       <Container style={this.parseStyle()} ref={ref => this.$ = ref}>
         {this.props.children.map((child, index) => React.cloneElement(child, {
-          onStart: this.initChildrenCoordinate,
-          onDrag: this.calcNewPosition(index),
-          onStop: this.resetDragState,
+          _init: this.initChildrenCoordinate,
+          _calc: this.calcNewPosition(index),
+          _stop: this.resetDragState,
           active: vIndices.concat(hIndices).includes(index),
           activeClassName,
         }))}

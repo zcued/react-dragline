@@ -1,6 +1,5 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import update from 'immutability-helper'
 import { DraggableContainer, DraggableChild } from './src/index'
 
 
@@ -14,14 +13,6 @@ const initialChildren = [
 class Example extends React.Component {
   state = {
     children: initialChildren,
-  }
-
-  handleChange = (index, position) => {
-    const children = update(this.state.children, {
-      [index]: {position: {$set: position}},
-    })
-
-    this.setState({children})
   }
 
   render() {
@@ -39,7 +30,7 @@ class Example extends React.Component {
         <style>{'.active { opacity: .5; }'}</style>
         <DraggableContainer style={containerStyle}>
           {
-            this.state.children.map(({ id, background, size, position }, index) => {
+            this.state.children.map(({ id, background, size, position }) => {
               const style = {
                 background,
                 width: size,
@@ -52,7 +43,10 @@ class Example extends React.Component {
               }
 
               return (
-                <DraggableChild key={id} position={position} handleChange={position => this.handleChange(index, position)}>
+                <DraggableChild
+                  key={id}
+                  defaultPosition={position}
+                >
                   <div className="item" style={style}>
                     <span>size: {size}</span>
                     <span>drag me</span>

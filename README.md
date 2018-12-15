@@ -23,8 +23,6 @@ If you aren't using browserify/webpack, a [UMD version of react-drag-guideline](
 ### Example
 ```js
 import { DraggableContainer, DraggableChild } from 'react-drag-guideline'
-import update from 'immutability-helper'
-// https://github.com/kolodny/immutability-helper
 
 
 class Example extends React.Component {
@@ -32,14 +30,6 @@ class Example extends React.Component {
     { id: 1, position: {x: 100, y: 10} },
     { id: 2, position: {x: 400, y: 200} },
   ]
-
-  handleChange = (index, position) => {
-    const children = update(this.state.children, {
-      [index]: {position: {$set: position}},
-    })
-
-    this.setState({children})
-  }
 
   render() {
     const containerStyle = {
@@ -59,7 +49,7 @@ class Example extends React.Component {
             }
 
             return (
-              <DraggableChild key={id} position={position} handleChange={position => this.handleChange(index, position)}>
+              <DraggableChild key={id} defaultPosition={position}>
                 <div style={style} />
               </DraggableChild>
             )

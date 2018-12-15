@@ -150,12 +150,23 @@ export default class DraggableContainer extends React.Component {
       W = target.w,
       H = target.h,
 
+      /**
+       * https://github.com/zcued/react-drag-guideline/issues/9
+       *
+       *  1 x, y为拖拽预期值（啥叫预期值？就是假设没有吸附功能，x, y即为真实的坐标）。
+       *    依据x, y计算辅助线的长度，在x, y辅助线同时出现时会有一定的偏差，
+       *    使用吸附处理后的x, y计算辅助线才是正确的打开方式。
+       *
+       *  2 早期在解决遇到该问题时，未思考明确，因此暂时使用$.offsetTop/offsetLeft计算辅助线。
+       *    在计算拖拽下一帧的位置时，通过DOM求出的offsetTop/offsetLeft实际为当前帧的，
+       *    因此辅助线实际为上一帧的辅助线。
+       */
+
       // T = y,
       // B = y + H,
       // L = x,
       // R = x + W
 
-      // optimize: x, y 为拖拽预期值，并非真实坐标。依据x,y计算辅助线的长度，在xy辅助线交汇时会有一定的偏差、
       T = $.offsetTop,
       B = $.offsetTop + H,
       L = $.offsetLeft,

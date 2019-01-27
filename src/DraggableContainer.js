@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { unique, checkArrayWithPush } from './utils'
+import { unique, checkArrayWithPush, getMaxDistance } from './utils'
 
 
 export default class DraggableContainer extends React.Component {
@@ -35,10 +35,9 @@ export default class DraggableContainer extends React.Component {
     super(props)
 
     this.state = {
-      vIndices: [],
-      hIndices: [],
-      vLine: [],
-      hLine: [],
+      indices: [],
+      vLines: [],
+      hLines: [],
       static: false,
     }
   }
@@ -48,7 +47,7 @@ export default class DraggableContainer extends React.Component {
   }
 
   // 拖拽初始时 计算出所有元素的坐标信息，存储于this.$children
-  initChildrenCoordinate = () => {
+  initialize = () => {
     this.$children = this.props.children.map((child, i) => {
       const $ = this.$.childNodes[i]
       const x = Number($.getAttribute('data-x'))
@@ -74,109 +73,131 @@ export default class DraggableContainer extends React.Component {
   }
 
   // 拖动中计算是否吸附/显示辅助线
-  calcNewPosition = (index) => {
+  calc = (index) => {
     return (x, y) => {
       const target = this.$children[index]
       const compares = this.$children.filter((_, i) => i !== index)
 
       if (this.props.limit) {
-        const {limitX, limitY} = this.checkDragOut({x, y}, target)
+        const { limitX, limitY } = this.checkDragOut({ x, y }, target)
         x = limitX
         y = limitY
       }
 
-      return {
-        x: this.compareNear({x, y}, compares, target, 'x'),
-        y: this.compareNear({x, y}, compares, target, 'y'),
-      }
+      return this.calcAndDrawLines({ x, y }, target, compares)
     }
   }
 
-  resetDragState = () => {
-    this.setState({vLine: [], hLine: [], vIndices: [], hIndices: []})
-  }
-
-  getMaxDistance = (arr) => {
-    const num = arr.sort((a, b) => a - b)
-    return num[num.length - 1] - num[0]
-  }
-
-  // 检查是否拖出容器
-  checkDragOut({x, y}, target) {
-    const maxLeft = this.$.clientWidth - target.w
-    const maxTop = this.$.clientHeight - target.h
-    let limitX = x
-    let limitY = y
-
-    if (x < 0) {
-      limitX = 0
-    } else if (x > maxLeft) {
-      limitX = maxLeft
-    }
-
-    if (y < 0) {
-      limitY = 0
-    } if (y > maxTop) {
-      limitY = maxTop
-    }
-
-    return {limitX, limitY}
-  }
-
-  // 检查容器是否有定位属性
-  checkContainerPosition() {
-    const position = window.getComputedStyle(this.$, null).getPropertyValue('position')
-    if (position === 'static') {
-      console.error(
-        'Warning: The `position` attribute of container is `static`! It may cause an error if you render in server-side.',
-      )
-      this.setState({static: true})
-    }
-  }
-
-  parseStyle() {
-    return this.state.static
-      ? {...this.props.style, position: 'relative'}
-      : this.props.style
+  reset = () => {
+    this.setState({ vLines: [], hLines: [], indices: [] })
   }
 
   /**
-   * lowerCase => compare
-   * upperCase => target
+   * @param {Object} values xy坐标
+   * @param {Object} target 拖拽目标
+   * @param {Array} compares 对照组
    */
-  compareNearSingle({x, y}, dire, {l, r, t, b, lr, tb}, target, key) {
+  calcAndDrawLines(values, target, compares) {
+    const { v: x, indices: indices_x, lines: vLines } = this.calcPosValues(values, target, compares, 'x')
+    const { v: y, indices: indices_y, lines: hLines } = this.calcPosValues(values, target, compares, 'y')
+
+    const indices = unique(indices_x.concat(indices_y))
+
+    // https://github.com/zcued/react-drag-guideline/issues/9
+    if (vLines.length && hLines.length) {
+      vLines.forEach(line => {
+        const compare = compares.find(({ i }) => i === line.i)
+        const { length, origin } = this.calcLineValues({ x, y }, target, compare, 'x')
+
+        line.length = length
+        line.origin = origin
+      })
+
+
+      hLines.forEach(line => {
+        const compare = compares.find(({ i }) => i === line.i)
+        const { length, origin } = this.calcLineValues({ x, y }, target, compare, 'y')
+
+        line.length = length
+        line.origin = origin
+      })
+    }
+
+    this.setState({
+      vLines,
+      hLines,
+      indices,
+    })
+
+    return { x, y }
+  }
+
+  calcLineValues(values, target, compare, key) {
+    const { x, y } = values
+    const { h: H, w: W } = target
+    const { l, r, t, b } = compare
     const
-      $ = target.$,
-      W = target.w,
-      H = target.h,
+      T = y,
+      B = y + H,
+      L = x,
+      R = x + W
 
-      /**
-       * https://github.com/zcued/react-drag-guideline/issues/9
-       *
-       *  1 x, y为拖拽预期值（啥叫预期值？就是假设没有吸附功能，x, y即为真实的坐标）。
-       *    依据x, y计算辅助线的长度，在x, y辅助线同时出现时会有一定的偏差，
-       *    使用吸附处理后的x, y计算辅助线才是正确的打开方式。
-       *
-       *  2 早期在解决遇到该问题时，未思考明确，因此暂时使用$.offsetTop/offsetLeft计算辅助线。
-       *    在计算拖拽下一帧的位置时，通过DOM求出的offsetTop/offsetLeft实际为当前帧的，
-       *    因此辅助线实际为上一帧的辅助线。
-       */
-
-      // T = y,
-      // B = y + H,
-      // L = x,
-      // R = x + W
-
-      T = $.offsetTop,
-      B = $.offsetTop + H,
-      L = $.offsetLeft,
-      R = $.offsetLeft + W
-
-
-    const paramsForLine = {
+    const direValues = {
       x: [t, b, T, B],
       y: [l, r, L, R],
     }
+
+    const length = getMaxDistance(direValues[key])
+    const origin = Math.min(...direValues[key])
+    return { length, origin }
+  }
+
+  calcPosValues(values, target, compares, key) {
+    const results = {}
+
+    const directions = {
+      x: ['ll', 'rr', 'lr'],
+      y: ['tt', 'bb', 'tb'],
+    }
+
+    // filter unnecessary directions
+    const validDirections = directions[key].filter(dire => this.props.directions.includes(dire))
+
+    compares.forEach((compare) => {
+      validDirections.forEach(dire => {
+        const { near, dist, value, origin, length } = this.calcPosValuesSingle(values, dire, target, compare, key)
+        if (near) {
+          checkArrayWithPush(results, dist, { i: compare.i, $: compare.$ , value, origin, length })
+        }
+      })
+    })
+
+    const resultArray = Object.entries(results)
+    if (resultArray.length) {
+      const [minDistance, activeCompares] = resultArray.sort(([dist1], [dist2]) => Math.abs(dist1) - Math.abs(dist2))[0]
+      const dist = parseInt(minDistance)
+      return {
+        v: values[key] - dist,
+        dist: dist,
+        lines: activeCompares,
+        indices: activeCompares.map(({ i }) => i),
+      }
+    }
+
+    return {
+      v: values[key],
+      dist: 0,
+      lines: [],
+      indices: [],
+    }
+  }
+
+  calcPosValuesSingle(values, dire, target, compare, key) {
+    const { x, y } = values
+    const W = target.w
+    const H = target.h
+    const { l, r, t, b, lr, tb } = compare
+    const { origin, length } = this.calcLineValues({ x, y }, target, compare, key)
 
     const result = {
       // 距离是否达到吸附阈值
@@ -186,13 +207,9 @@ export default class DraggableContainer extends React.Component {
       // 辅助线坐标
       value: 0,
       // 辅助线长度
-      length: this.getMaxDistance(paramsForLine[key]),
+      length,
       // 辅助线起始坐标（对应绝对定位的top/left）
-      origin: Math.min(...paramsForLine[key]),
-    }
-
-    if (!this.props.directions.includes(dire)) {
-      return result
+      origin,
     }
 
     switch (dire) {
@@ -224,70 +241,53 @@ export default class DraggableContainer extends React.Component {
 
     if (Math.abs(result.dist) < this.props.threshold + 1) {
       result.near = true
-      return result
     }
 
     return result
   }
 
-  compareNear(values, compares, target, key) {
-    const diffs = {
-      lineState: {
-        x: 'vLine',
-        y: 'hLine',
-      },
-      indices: {
-        x: 'vIndices',
-        y: 'hIndices',
-      },
-      directions: {
-        x: ['ll', 'rr', 'lr'],
-        y: ['tt', 'bb', 'tb'],
-      },
+  // 检查是否拖出容器
+  checkDragOut({ x, y }, target) {
+    const maxLeft = this.$.clientWidth - target.w
+    const maxTop = this.$.clientHeight - target.h
+
+    let limitX = x
+    let limitY = y
+
+    if (x < 0) {
+      limitX = 0
+    } else if (x > maxLeft) {
+      limitX = maxLeft
     }
 
-    const lineState = diffs.lineState[key]
-    const directions = diffs.directions[key]
-    const indices = diffs.indices[key]
+    if (y < 0) {
+      limitY = 0
+    } if (y > maxTop) {
+      limitY = maxTop
+    }
 
-    /**
-     * results: {
-     *   distance1: [{i, value, origin, length}],
-     *   distance2: [{i, value, origin, length}],
-     * }
-     * distance: 与需要显示辅助线坐标的距离
-     */
-    const results = {}
+    return { limitX, limitY }
+  }
 
-    compares.forEach((compare) => {
-      directions.forEach(dire => {
-        const {near, dist, value, origin, length} = this.compareNearSingle(values, dire, compare, target, key)
-        if (near) {
-          checkArrayWithPush(results, dist, {i: compare.i, value, origin, length})
-        }
-      })
-    })
-
-    const resultArray = Object.entries(results)
-    if (resultArray.length) {
-      // 多个元素符合阈值时， 排序 => 取最小
-      const [minDistance, lines] = resultArray.sort(([dist1], [dist2]) => Math.abs(dist1) - Math.abs(dist2))[0]
-      this.setState({
-        [lineState]: lines,
-        [indices]: unique(lines.map(({i}) => i)),
-      })
-      return values[key] - minDistance
-    } else {
-      this.setState({
-        [lineState]: [],
-        [indices]: [],
-      })
-      return values[key]
+  // 检查容器是否有定位属性
+  checkContainerPosition() {
+    const position = window.getComputedStyle(this.$, null).getPropertyValue('position')
+    if (position === 'static') {
+      console.error(
+        'Warning: The `position` attribute of container is `static`! It may cause an error if you render in server-side.',
+      )
+      this.setState({ static: true })
     }
   }
 
+  parseStyle() {
+    return this.state.static
+      ? { ...this.props.style, position: 'relative' }
+      : this.props.style
+  }
+
   _renderGuideLine() {
-    const { vLine, hLine } = this.state
+    const { vLines, hLines } = this.state
     const { lineStyle } = this.props
     const commonStyle = {
       position: 'absolute',
@@ -300,13 +300,13 @@ export default class DraggableContainer extends React.Component {
 
     return (
       <Container>
-        {vLine.map(({length, value, origin}, i) => (
+        {vLines.map(({ length, value, origin }, i) => (
           <span
             key={`v-${i}`}
             style={{ left: value, top: origin, height: length, width: 1, ...commonStyle }}
           />
         ))}
-        {hLine.map(({length, value, origin}, i) => (
+        {hLines.map(({ length, value, origin }, i) => (
           <span
             key={`h-${i}`}
             style={{ top: value, left: origin, width: length, height: 1, ...commonStyle }}
@@ -318,14 +318,14 @@ export default class DraggableContainer extends React.Component {
 
   render() {
     const { Container, activeClassName } = this.props
-    const { vIndices, hIndices } = this.state
+    const { indices } = this.state
     return (
       <Container style={this.parseStyle()} ref={ref => this.$ = ref}>
         {this.props.children.map((child, index) => React.cloneElement(child, {
-          _init: this.initChildrenCoordinate,
-          _calc: this.calcNewPosition(index),
-          _stop: this.resetDragState,
-          active: vIndices.concat(hIndices).includes(index),
+          _init: this.initialize,
+          _calc: this.calc(index),
+          _stop: this.reset,
+          active: indices.includes(index),
           activeClassName,
         }))}
         {this._renderGuideLine()}

@@ -19,7 +19,7 @@ export const checkArrayWithPush = (target, key, value) => {
   }
 }
 
-export const createCoreData = ({node, deltaX, deltaY}, {originX, originY, x, y}) => {
+export const createCoreData = ({ node, deltaX, deltaY }, { originX, originY, x, y }) => {
   return {
     node,
     deltaY,
@@ -29,6 +29,11 @@ export const createCoreData = ({node, deltaX, deltaY}, {originX, originY, x, y})
     x,
     y,
   }
+}
+
+export const getMaxDistance = (arr) => {
+  const num = arr.sort((a, b) => a - b)
+  return num[num.length - 1] - num[0]
 }
 
 export default {

@@ -80,20 +80,20 @@ export default class DraggableContainer extends React.Component {
       const compares = this.$children.filter((_, i) => i !== index)
 
       if (this.props.limit) {
-        const {limitX, limitY} = this.checkDragOut({x, y}, target)
+        const { limitX, limitY } = this.checkDragOut({ x, y }, target)
         x = limitX
         y = limitY
       }
 
       return {
-        x: this.compareNear({x, y}, compares, target, 'x'),
-        y: this.compareNear({x, y}, compares, target, 'y'),
+        x: this.compareNear({ x, y }, compares, target, 'x'),
+        y: this.compareNear({ x, y }, compares, target, 'y'),
       }
     }
   }
 
   resetDragState = () => {
-    this.setState({vLine: [], hLine: [], vIndices: [], hIndices: []})
+    this.setState({ vLine: [], hLine: [], vIndices: [], hIndices: [] })
   }
 
   getMaxDistance = (arr) => {
@@ -102,7 +102,7 @@ export default class DraggableContainer extends React.Component {
   }
 
   // 检查是否拖出容器
-  checkDragOut({x, y}, target) {
+  checkDragOut({ x, y }, target) {
     const maxLeft = this.$.clientWidth - target.w
     const maxTop = this.$.clientHeight - target.h
     let limitX = x
@@ -120,7 +120,7 @@ export default class DraggableContainer extends React.Component {
       limitY = maxTop
     }
 
-    return {limitX, limitY}
+    return { limitX, limitY }
   }
 
   // 检查容器是否有定位属性
@@ -130,13 +130,13 @@ export default class DraggableContainer extends React.Component {
       console.error(
         'Warning: The `position` attribute of container is `static`! It may cause an error if you render in server-side.',
       )
-      this.setState({static: true})
+      this.setState({ static: true })
     }
   }
 
   parseStyle() {
     return this.state.static
-      ? {...this.props.style, position: 'relative'}
+      ? { ...this.props.style, position: 'relative' }
       : this.props.style
   }
 
@@ -144,7 +144,7 @@ export default class DraggableContainer extends React.Component {
    * lowerCase => compare
    * upperCase => target
    */
-  compareNearSingle({x, y}, dire, {l, r, t, b, lr, tb}, target, key) {
+  compareNearSingle({ x, y }, dire, { l, r, t, b, lr, tb }, target, key) {
     const
       $ = target.$,
       W = target.w,
@@ -261,9 +261,9 @@ export default class DraggableContainer extends React.Component {
 
     compares.forEach((compare) => {
       directions.forEach(dire => {
-        const {near, dist, value, origin, length} = this.compareNearSingle(values, dire, compare, target, key)
+        const { near, dist, value, origin, length } = this.compareNearSingle(values, dire, compare, target, key)
         if (near) {
-          checkArrayWithPush(results, dist, {i: compare.i, value, origin, length})
+          checkArrayWithPush(results, dist, { i: compare.i, value, origin, length })
         }
       })
     })
@@ -274,7 +274,7 @@ export default class DraggableContainer extends React.Component {
       const [minDistance, lines] = resultArray.sort(([dist1], [dist2]) => Math.abs(dist1) - Math.abs(dist2))[0]
       this.setState({
         [lineState]: lines,
-        [indices]: unique(lines.map(({i}) => i)),
+        [indices]: unique(lines.map(({ i }) => i)),
       })
       return values[key] - minDistance
     } else {
@@ -300,13 +300,13 @@ export default class DraggableContainer extends React.Component {
 
     return (
       <Container>
-        {vLine.map(({length, value, origin}, i) => (
+        {vLine.map(({ length, value, origin }, i) => (
           <span
             key={`v-${i}`}
             style={{ left: value, top: origin, height: length, width: 1, ...commonStyle }}
           />
         ))}
-        {hLine.map(({length, value, origin}, i) => (
+        {hLine.map(({ length, value, origin }, i) => (
           <span
             key={`h-${i}`}
             style={{ top: value, left: origin, width: length, height: 1, ...commonStyle }}

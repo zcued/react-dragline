@@ -33,17 +33,17 @@ export default class DraggableChild extends React.Component {
   }
 
   handleStart = (ev, b) => {
-    const {x, y} = this.state
+    const { x, y } = this.state
     this.lastX = b.lastX - x
     this.lastY = b. lastY - y
     this.props._init()
-    this.props.onStart(ev, createCoreData(b, {x, y}))
+    this.props.onStart(ev, createCoreData(b, { x, y }))
   }
 
   handleDrag = (ev, b) => {
     const dragX = b.lastX - this.lastX
     const dragY = b.lastY - this.lastY
-    const {x, y} = this.props._calc(dragX, dragY)
+    const { x, y } = this.props._calc(dragX, dragY)
     this.setState({ x, y })
 
     this.props.onDrag(ev, createCoreData(b, {
@@ -55,14 +55,14 @@ export default class DraggableChild extends React.Component {
   }
 
   handleStop = (ev, b) => {
-    const {x, y} = this.state
+    const { x, y } = this.state
     this.props._stop()
-    this.props.onStop(ev, createCoreData(b, {x, y}))
+    this.props.onStop(ev, createCoreData(b, { x, y }))
   }
 
   render() {
     const { x, y } = this.state
-    const {active, children, activeClassName} = this.props
+    const { active, children, activeClassName } = this.props
     const style = {
       ...children.props.style,
       position: 'absolute',

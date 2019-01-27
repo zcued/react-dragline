@@ -19,7 +19,7 @@ export const checkArrayWithPush = (target, key, value) => {
   }
 }
 
-export const createCoreData = ({node, deltaX, deltaY}, {originX, originY, x, y}) => {
+export const createCoreData = ({ node, deltaX, deltaY }, { originX, originY, x, y }) => {
   return {
     node,
     deltaY,

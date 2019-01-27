@@ -4,10 +4,10 @@ import { DraggableContainer, DraggableChild } from './src/index'
 
 
 const initialChildren = [
-  { id: 1, background: '#8ce8df', size: 100, position: {x: 100, y: 10} },
-  { id: 2, background: '#8ce8df', size: 100, position: {x: 400, y: 106} },
-  { id: 4, background: '#d2aff6', size: 150, position: {x: 100, y: 316} },
-  { id: 5, background: '#fee493', size: 200, position: {x: 480, y: 376} },
+  { id: 1, background: '#8ce8df', size: 100, position: { x: 100, y: 10 } },
+  { id: 2, background: '#8ce8df', size: 100, position: { x: 400, y: 106 } },
+  { id: 4, background: '#d2aff6', size: 150, position: { x: 100, y: 316 } },
+  { id: 5, background: '#fee493', size: 200, position: { x: 480, y: 376 } },
 ]
 
 class Example extends React.Component {

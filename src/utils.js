@@ -31,6 +31,11 @@ export const createCoreData = ({ node, deltaX, deltaY }, { originX, originY, x, 
   }
 }
 
+export const getMaxDistance = (arr) => {
+  const num = arr.sort((a, b) => a - b)
+  return num[num.length - 1] - num[0]
+}
+
 export default {
   noop,
   unique,

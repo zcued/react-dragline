@@ -72,6 +72,10 @@ export default class DraggableContainer extends React.Component {
     })
   }
 
+  reset = () => {
+    this.setState({ vLines: [], hLines: [], indices: [] })
+  }
+
   // 拖动中计算是否吸附/显示辅助线
   calc = (index) => {
     return (x, y) => {
@@ -84,12 +88,12 @@ export default class DraggableContainer extends React.Component {
         y = limitY
       }
 
+      if (compares.length === 0) {
+        return { x, y }
+      }
+
       return this.calcAndDrawLines({ x, y }, target, compares)
     }
-  }
-
-  reset = () => {
-    this.setState({ vLines: [], hLines: [], indices: [] })
   }
 
   /**
@@ -302,12 +306,14 @@ export default class DraggableContainer extends React.Component {
       <Container>
         {vLines.map(({ length, value, origin }, i) => (
           <span
+            className="v-line"
             key={`v-${i}`}
             style={{ left: value, top: origin, height: length, width: 1, ...commonStyle }}
           />
         ))}
         {hLines.map(({ length, value, origin }, i) => (
           <span
+            className="h-line"
             key={`h-${i}`}
             style={{ top: value, left: origin, width: length, height: 1, ...commonStyle }}
           />
@@ -316,18 +322,35 @@ export default class DraggableContainer extends React.Component {
     )
   }
 
-  render() {
-    const { Container, activeClassName } = this.props
+  _renderChildren() {
+    const { activeClassName, children } = this.props
     const { indices } = this.state
+
+    if (Array.isArray(children)) {
+      return (
+        <React.Fragment>
+          {
+            children.map((child, index) => React.cloneElement(child, {
+              _init: this.initialize,
+              _calc: this.calc(index),
+              _stop: this.reset,
+              active: indices.includes(index),
+              activeClassName,
+            }))
+          }
+        </React.Fragment>
+      )
+    }
+
+    return children
+  }
+
+  render() {
+    const { Container } = this.props
+
     return (
       <Container style={this.parseStyle()} ref={ref => this.$ = ref}>
-        {this.props.children.map((child, index) => React.cloneElement(child, {
-          _init: this.initialize,
-          _calc: this.calc(index),
-          _stop: this.reset,
-          active: indices.includes(index),
-          activeClassName,
-        }))}
+        {this._renderChildren()}
         {this._renderGuideLine()}
       </Container>
     )

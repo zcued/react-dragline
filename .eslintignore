@@ -4,3 +4,4 @@ dist
 lib
 example
 docs
+__tests__

@@ -12,7 +12,7 @@
     "clean:umd": "rimraf dist",
     "clean:cjs": "rimraf lib",
     "lint": "eslint ./src",
-    "test": "mocha --require @babel/register --require ./test/setup.js --require ignore-styles --recursive ./test"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -38,15 +38,18 @@
     "@babel/cli": "^7.1.5",
     "@babel/core": "^7.1.6",
     "@babel/runtime": "^7.1.5",
+    "@react-mock/state": "^0.1.7",
     "babel-eslint": "^8.2.2",
     "babel-loader": "^8.0.4",
     "babel-preset-next": "^1.1.3",
-    "enzyme": "^3.3.0",
+    "enzyme": "^3.8.0",
+    "enzyme-adapter-react-16": "^1.8.0",
     "eslint": "^4.19.1",
     "eslint-config-zcool": "^1.4.0",
     "eslint-loader": "^2.0.0",
     "eslint-plugin-react": "^7.7.0",
     "immutability-helper": "^2.8.1",
+    "jest": "^24.0.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "rimraf": "^2.6.2",

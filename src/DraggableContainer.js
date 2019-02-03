@@ -4,7 +4,10 @@ import { unique, checkArrayWithPush, getMaxDistance } from './utils'
 
 
 export default class DraggableContainer extends React.Component {
-  $ = null // container HTMLElement
+  // container HTMLElement
+  $ = null
+  // children HTMLElement
+  $children = []
 
   static propTypes = {
     Container: PropTypes.oneOfType([

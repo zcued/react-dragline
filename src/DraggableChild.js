@@ -35,15 +35,15 @@ export default class DraggableChild extends React.Component {
   handleStart = (ev, b) => {
     const { x, y } = this.state
     this.lastX = b.lastX - x
-    this.lastY = b. lastY - y
-    this.props._init()
+    this.lastY = b.lastY - y
+    this.props._start()
     this.props.onStart(ev, createCoreData(b, { x, y }))
   }
 
   handleDrag = (ev, b) => {
     const dragX = b.lastX - this.lastX
     const dragY = b.lastY - this.lastY
-    const { x, y } = this.props._calc(dragX, dragY)
+    const { x, y } = this.props._drag(dragX, dragY)
     this.setState({ x, y })
 
     this.props.onDrag(ev, createCoreData(b, {

@@ -41,12 +41,7 @@ export default class DraggableContainer extends React.Component {
       indices: [],
       vLines: [],
       hLines: [],
-      static: false,
     }
-  }
-
-  componentDidMount() {
-    this.checkContainerPosition()
   }
 
   // 拖拽初始时 计算出所有元素的坐标信息，存储于this.$children
@@ -276,23 +271,6 @@ export default class DraggableContainer extends React.Component {
     return { limitX, limitY }
   }
 
-  // 检查容器是否有定位属性
-  checkContainerPosition() {
-    const position = window.getComputedStyle(this.$, null).getPropertyValue('position')
-    if (position === 'static') {
-      console.error(
-        'Warning: The `position` attribute of container is `static`! It may cause an error if you render in server-side.',
-      )
-      this.setState({ static: true })
-    }
-  }
-
-  parseStyle() {
-    return this.state.static
-      ? { ...this.props.style, position: 'relative' }
-      : this.props.style
-  }
-
   _renderGuideLine() {
     const { vLines, hLines } = this.state
     const { lineStyle } = this.props
@@ -334,8 +312,8 @@ export default class DraggableContainer extends React.Component {
         <React.Fragment>
           {
             children.map((child, index) => React.cloneElement(child, {
-              _init: this.initialize,
-              _calc: this.calc(index),
+              _start: this.initialize,
+              _drag: this.calc(index),
               _stop: this.reset,
               active: indices.includes(index),
               activeClassName,
@@ -349,10 +327,10 @@ export default class DraggableContainer extends React.Component {
   }
 
   render() {
-    const { Container } = this.props
+    const { Container, style } = this.props
 
     return (
-      <Container style={this.parseStyle()} ref={ref => this.$ = ref}>
+      <Container style={style} ref={ref => this.$ = ref}>
         {this._renderChildren()}
         {this._renderGuideLine()}
       </Container>

@@ -61,7 +61,7 @@
   "dependencies": {
     "@babel/polyfill": "^7.0.0",
     "classnames": "^2.2.6",
-    "prop-types": "^15.6.2",
+    "prop-types": "15.7.1",
     "react-draggable": "^2.2.6"
   },
   "peerDependencies": {

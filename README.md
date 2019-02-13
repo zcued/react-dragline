@@ -73,9 +73,10 @@ ReactDOM.render(<Example />, container)
 | lineStyle | Object | {} | You can customize the style of auxiliary line by this option |
 | limit | String | true | Whether to restricts movement within the container |
 
-### Development
-```
-1. npm install
-2. npm start
-The example will open in browser automatically
-```
+### Contributing
+1. Fork, then clone the project.
+2. Run the project in development mode: `$ yarn start`.
+3. Make your changes.
+4. Lint the code: `$ yarn lint`
+5. Make sure that the tests still pass:`$ yarn test`
+6. Commit and PR.

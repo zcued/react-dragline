@@ -312,8 +312,8 @@ export default class DraggableContainer extends React.Component {
         <React.Fragment>
           {
             children.map((child, index) => React.cloneElement(child, {
-              _init: this.initialize,
-              _calc: this.calc(index),
+              _start: this.initialize,
+              _drag: this.calc(index),
               _stop: this.reset,
               active: indices.includes(index),
               activeClassName,

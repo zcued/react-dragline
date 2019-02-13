@@ -65,3 +65,6 @@ typings/
 
 # library
 lib
+
+# mac
+.DS_Store

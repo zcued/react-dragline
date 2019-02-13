@@ -12,7 +12,7 @@
     "clean:umd": "rimraf dist",
     "clean:cjs": "rimraf lib",
     "lint": "eslint ./src",
-    "test": "jest __tests__/*-test.js"
+    "test": "jest"
   },
   "repository": {
     "type": "git",

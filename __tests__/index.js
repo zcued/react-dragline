@@ -1,3 +1,4 @@
+import React from 'react'
 import { mount } from 'enzyme'
 import { StateMock } from '@react-mock/state'
 import { DraggableContainer, DraggableChild } from '../src/index'

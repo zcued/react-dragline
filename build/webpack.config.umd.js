@@ -6,7 +6,7 @@ const argv = require('yargs').argv
 const minify = Boolean(argv.minify)
 const mode = minify ? 'production' : 'development'
 const devtool = minify ? 'source-map' : undefined
-const filename = minify ? 'react-drag-guideline.min.js' : 'react-drag-guideline.js'
+const filename = minify ? 'react-dragline.min.js' : 'react-dragline.js'
 
 
 module.exports = {

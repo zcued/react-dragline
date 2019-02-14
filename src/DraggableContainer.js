@@ -105,7 +105,7 @@ export default class DraggableContainer extends React.Component {
 
     const indices = unique(indices_x.concat(indices_y))
 
-    // https://github.com/zcued/react-drag-guideline/issues/9
+    // https://github.com/zcued/react-dragline/issues/9
     if (vLines.length && hLines.length) {
       vLines.forEach(line => {
         const compare = compares.find(({ i }) => i === line.i)

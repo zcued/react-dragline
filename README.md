@@ -1,28 +1,28 @@
-# react-drag-guideline
-> Guide lines to better align draggable children in React.
+# react-dragline
+> Guide lines and magnetic adsorption to better align draggable elements.
 
-[![npm version](https://img.shields.io/npm/v/react-drag-guideline.svg)](https://www.npmjs.com/package/react-drag-guideline)
-[![npm downloads](https://img.shields.io/npm/dt/react-drag-guideline.svg)](https://www.npmjs.com/package/react-drag-guideline)
-[![license](https://img.shields.io/npm/l/react-drag-guideline.svg)](https://github.com/zcued/react-drag-guideline/blob/master/LICENSE)
+[![npm version](https://img.shields.io/npm/v/react-dragline.svg)](https://www.npmjs.com/package/react-dragline)
+[![npm downloads](https://img.shields.io/npm/dt/react-dragline.svg)](https://www.npmjs.com/package/react-dragline)
+[![license](https://img.shields.io/npm/l/react-dragline.svg)](https://github.com/zcued/react-dragline/blob/master/LICENSE)
 
 
- **Examples available here:** [https://zcued.github.io/react-drag-guideline/](https://zcued.github.io/react-drag-guideline/)
+ **Examples available here:** [https://zcued.github.io/react-dragline/](https://zcued.github.io/react-dragline/)
 
 
 ### Installation
 **npm**
 ```
-npm install react-drag-guideline --save
+npm install react-dragline --save
 ```
 **yarn**
 ```
-yarn add install react-drag-guideline
+yarn add install react-dragline
 ```
-If you aren't using browserify/webpack, a [UMD version of react-drag-guideline](https://github.com/zcued/react-drag-guideline/tree/master/dist) is available. It expects external React and ReactDOM.
+If you aren't using browserify/webpack, a [UMD version of react-dragline](https://github.com/zcued/react-dragline/tree/master/dist) is available. It expects external React and ReactDOM.
 
 ### Example
 ```js
-import { DraggableContainer, DraggableChild } from 'react-drag-guideline'
+import { DraggableContainer, DraggableChild } from 'react-dragline'
 
 
 class Example extends React.Component {

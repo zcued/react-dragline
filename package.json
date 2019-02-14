@@ -1,8 +1,27 @@
 {
-  "name": "react-drag-guideline",
+  "name": "react-dragline",
   "version": "1.0.0",
-  "description": "Guide lines to better align draggable children in React",
+  "description": "Guide lines and magnetic adsorption to better align draggable elements in React",
+  "author": "Huang NuNu",
   "main": "lib/index.js",
+  "license": "MIT",
+  "homepage": "https://github.com/zcued/react-dragline",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zcued/react-dragline.git"
+  },
+  "bugs": {
+    "url": "https://github.com/zcued/react-dragline/issues"
+  },
+  "keywords": [
+    "react",
+    "dragline",
+    "draggable",
+    "react-dragline",
+    "react-draggable",
+    "react-component",
+    "magnetic adsorption"
+  ],
   "scripts": {
     "start": "NODE_ENV=dev webpack-dev-server --progress --color --config build --hot",
     "build": "npm run build:umd && npm run build:cjs",
@@ -14,26 +33,6 @@
     "lint": "eslint ./src",
     "test": "jest"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/zcued/react-drag-guideline.git"
-  },
-  "keywords": [
-    "react",
-    "react-line",
-    "react-guideline",
-    "react-component-line",
-    "react-component-guideline",
-    "react-drag-line",
-    "react-drag-guideline",
-    "react-drag-ref-line"
-  ],
-  "author": "huangdehao",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/zcued/react-drag-guideline/issues"
-  },
-  "homepage": "https://github.com/zcued/react-drag-guideline#readme",
   "devDependencies": {
     "@babel/cli": "^7.1.5",
     "@babel/core": "^7.1.6",

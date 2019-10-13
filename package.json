@@ -23,48 +23,21 @@
     "magnetic adsorption"
   ],
   "scripts": {
-    "start": "NODE_ENV=dev webpack-dev-server --progress --color --config build --hot",
-    "build": "npm run build:umd && npm run build:cjs",
-    "build:umd": "npm run clean:umd && NODE_ENV=umd webpack --progress --config build && NODE_ENV=umd webpack --progress --config build --minify",
-    "build:cjs": "npm run clean:cjs && babel src --out-dir lib",
-    "build:docs": "NODE_ENV=docs webpack --progress --config build",
-    "clean:umd": "rimraf dist",
-    "clean:cjs": "rimraf lib",
-    "lint": "eslint ./src",
-    "test": "jest"
+    "dev": "webpack-dev-server --progress --color --config dev/webpack.config.js  --hot"
   },
   "devDependencies": {
-    "@babel/cli": "^7.1.5",
-    "@babel/core": "^7.1.6",
-    "@babel/polyfill": "^7.2.5",
-    "@babel/preset-env": "^7.3.1",
-    "@babel/preset-react": "^7.0.0",
-    "@babel/plugin-transform-runtime": "^7.2.0",
-    "@babel/plugin-proposal-class-properties": "^7.3.0",
-    "@react-mock/state": "^0.1.7",
-    "babel-eslint": "^8.2.2",
-    "babel-loader": "^8.0.4",
-    "enzyme": "^3.8.0",
-    "enzyme-adapter-react-16": "^1.8.0",
-    "eslint": "^4.19.1",
-    "eslint-config-zcool": "^1.4.0",
-    "eslint-loader": "^2.0.0",
-    "eslint-plugin-react": "^7.7.0",
-    "immutability-helper": "^2.8.1",
-    "jest": "^24.0.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
-    "rimraf": "^2.6.2",
     "webpack": "^4.12.0",
-    "webpack-bundle-analyzer": "^3.0.3",
     "webpack-cli": "^3.0.3",
     "webpack-dev-server": "^3.1.4"
   },
   "dependencies": {
-    "@babel/runtime": "^7.1.5",
-    "classnames": "^2.2.6",
-    "prop-types": "15.7.1",
-    "react-draggable": "^2.2.6"
+    "@types/react": "^16.9.5",
+    "@types/react-dom": "^16.9.1",
+    "source-map-loader": "^0.2.4",
+    "ts-loader": "^6.2.0",
+    "typescript": "^3.6.4"
   },
   "peerDependencies": {
     "react": "^15.3.0 || ^16.0.0",

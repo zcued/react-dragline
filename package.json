@@ -23,7 +23,8 @@
     "magnetic adsorption"
   ],
   "scripts": {
-    "dev": "webpack-dev-server --progress --color --config dev/webpack.config.js  --hot"
+    "dev": "webpack-dev-server --progress --color --config dev/webpack.config.js  --hot",
+    "build": "tsc -p ."
   },
   "devDependencies": {
     "react": "^16.2.0",

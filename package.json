@@ -24,9 +24,15 @@
   ],
   "scripts": {
     "dev": "webpack-dev-server --progress --color --config dev/webpack.config.js  --hot",
-    "build": "tsc -p ."
+    "build": "tsc -p .",
+    "lint": "eslint ./src --ext .js,.jsx,.ts,.tsx"
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^2.3.3",
+    "@typescript-eslint/parser": "^2.3.3",
+    "eslint": "^6.5.1",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-react": "^7.16.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "webpack": "^4.12.0",

@@ -1,11 +1,12 @@
 const path = require('path')
 
+
 module.exports = {
   mode: 'development',
   devtool: 'source-map',
   entry: path.resolve(__dirname, './index.tsx'),
   resolve: {
-    extensions: ['.js', '.ts', '.tsx']
+    extensions: ['.js', '.ts', '.tsx'],
   },
   module: {
     rules: [
@@ -28,6 +29,6 @@ module.exports = {
   },
   devServer: {
     port: '8013',
-    contentBase: __dirname
+    contentBase: __dirname,
   },
 }

@@ -1,3 +1,5 @@
-import * as Hello from "./components/Hello"
+import * as DraggableContainer from './components/DraggableContainer'
+import * as DraggableChild from './components/DraggableChild'
 
-export default Hello
+
+export { DraggableContainer, DraggableChild }

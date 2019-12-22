@@ -11,7 +11,7 @@
 ### TODO
 - [x] Typescript Application开发环境搭建
 - [x] 集成Typescript Library构建，typings文件生成
-- [ ] TSLint & Gitmoji-cli
+- [x] TSLint & Gitmoji-cli
 - [ ] v1 -> v2源码迁移
 - [ ] 文档 & Example Online
 - [ ] 单元测试迁移

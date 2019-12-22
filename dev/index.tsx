@@ -1,9 +1,14 @@
-import * as React from "react"
-import * as ReactDOM from "react-dom"
+import * as React from 'react'
+import * as ReactDOM from 'react-dom'
+import { DraggableContainer } from '../src/index'
+import App from '../src/components/test'
 
-import Hello from "../src/components/Hello"
+
+// const A = () => (
+//   <div>hello</div>
+// )
 
 ReactDOM.render(
-  <Hello compiler="TypeScript" framework="React" />,
-  document.getElementById("root")
+  <App Tag={'a'} />,
+  document.getElementById('root')
 )

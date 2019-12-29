@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "Guide lines and magnetic adsorption to better align draggable elements in React",
   "author": "Huang NuNu",
-  "main": "lib/index.js",
+  "main": "dist/react-dragline.cjs.js",
+  "module": "dist/react-dragline.esm.js",
   "license": "MIT",
   "homepage": "https://github.com/zcued/react-dragline",
   "repository": {
@@ -23,30 +24,33 @@
     "magnetic adsorption"
   ],
   "scripts": {
-    "dev": "webpack-dev-server --progress --color --config dev/webpack.config.js  --hot",
-    "build": "tsc -p .",
+    "dev": "poi --serve",
+    "build": "cross-env NODE_ENV=production rollup -c",
     "lint": "eslint ./src --ext .js,.jsx,.ts,.tsx"
   },
   "devDependencies": {
+    "@types/classnames": "^2.2.9",
     "@typescript-eslint/eslint-plugin": "^2.3.3",
     "@typescript-eslint/parser": "^2.3.3",
     "add": "^2.0.6",
+    "cross-env": "^6.0.3",
     "csstype": "^2.6.7",
     "eslint": "^6.5.1",
     "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-react": "^7.16.0",
+    "poi": "^12.7.5",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
+    "rollup-plugin-typescript2": "^0.25.3",
     "webpack": "^4.12.0",
     "webpack-cli": "^3.0.3",
-    "webpack-dev-server": "^3.1.4",
-    "yarn": "^1.19.1"
+    "webpack-dev-server": "^3.1.4"
   },
   "dependencies": {
     "@types/react": "^16.9.5",
     "@types/react-dom": "^16.9.1",
+    "react-draggable": "^4.2.0",
     "source-map-loader": "^0.2.4",
-    "ts-loader": "^6.2.0",
     "typescript": "^3.6.4"
   },
   "peerDependencies": {

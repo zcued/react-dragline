@@ -3,7 +3,7 @@ import { unique, getMaxDistance } from './utils'
 
 
 interface Props {
-  Container: keyof JSX.IntrinsicElements
+  tag: keyof JSX.IntrinsicElements
   style: React.CSSProperties
   lineStyle: React.CSSProperties,
   directions: Array<Direction>
@@ -57,14 +57,14 @@ type DirectionX = 'll' | 'rr' | 'lr'
 type DirectionY = 'tt' | 'bb' | 'tb'
 type Direction = DirectionY | DirectionX
 
-export default class DraggableContainer extends React.Component<Props, State> {
+export class DraggableContainer extends React.Component<Props, State> {
   // container HTMLElement
-  $ = React.createRef<HTMLDivElement>()
+  $: HTMLElement = null
   // children HTMLElement
   $children: Array<DraggableElement> = []
 
   static defaultProps = {
-    Container: 'div',
+    tag: 'div',
     style: {},
     directions: ['tt', 'bb', 'll', 'rr', 'tb', 'lr' ],
     threshold: 5,
@@ -74,7 +74,7 @@ export default class DraggableContainer extends React.Component<Props, State> {
     lineStyle: {},
   }
 
-  static state = {
+  state: State = {
     indices: [],
     vLines: [],
     hLines: [],
@@ -381,13 +381,17 @@ export default class DraggableContainer extends React.Component<Props, State> {
   }
 
   render() {
-    const { Container, style } = this.props
+    const { tag, style } = this.props
+    const Wrapper = tag as 'div'
 
     return (
-      <Container style={style} ref={this.$}>
+      <Wrapper
+        style={style}
+        ref={ref => this.$ = ref}
+      >
         {this._renderChildren()}
         {this._renderGuideLine()}
-      </Container>
+      </Wrapper>
     )
   }
 }

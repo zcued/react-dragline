@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "declaration": true,
-    "declarationDir": "dist/types",
+    "declarationDir": "typings",
     "jsx": "react"
   }
 }

@@ -1,4 +1,3 @@
-// import React from 'react'
 import * as React from 'react'
 import { DraggableCore, DraggableEvent, DraggableData } from 'react-draggable'
 import classNames from 'classnames'
@@ -16,7 +15,7 @@ interface Props {
   onDrag?: Function
   onStop?: Function
 
-  /* --- emitter --- */
+  // the following props from parent component by React.cloneElement function
   _start?: Function
   _drag?: Function
   _stop?: Function
@@ -53,7 +52,6 @@ export class DraggableChild extends React.Component<Props, State> {
     const { x, y } = this.state
     this.lastX = b.lastX - x
     this.lastY = b.lastY - y
-    /* --- emitter --- */
     this.props._start()
     this.props.onStart(ev, createCoreData(b, { x, y }))
   }
@@ -61,7 +59,6 @@ export class DraggableChild extends React.Component<Props, State> {
   handleDrag = (ev: DraggableEvent, b: DraggableData) => {
     const dragX = b.lastX - this.lastX
     const dragY = b.lastY - this.lastY
-    /* --- emitter --- */
     const { x, y } = this.props._drag(dragX, dragY)
     this.setState({ x, y })
 
@@ -75,7 +72,6 @@ export class DraggableChild extends React.Component<Props, State> {
 
   handleStop = (ev: DraggableEvent, b: DraggableData) => {
     const { x, y } = this.state
-    /* --- emitter --- */
     this.props._stop()
     this.props.onStop(ev, createCoreData(b, { x, y }))
   }

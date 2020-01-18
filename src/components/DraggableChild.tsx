@@ -14,8 +14,9 @@ interface Props {
   onStart?: Function
   onDrag?: Function
   onStop?: Function
+}
 
-  // the following props from parent component by React.cloneElement function
+interface PropsFromParent {
   _start?: Function
   _drag?: Function
   _stop?: Function
@@ -49,20 +50,23 @@ export class DraggableChild extends React.Component<Props, State> {
   }
 
   handleStart = (ev: DraggableEvent, b: DraggableData) => {
+    const { _start, onStart } = this.props as (Props & PropsFromParent)
     const { x, y } = this.state
+
     this.lastX = b.lastX - x
     this.lastY = b.lastY - y
-    this.props._start()
-    this.props.onStart(ev, createCoreData(b, { x, y }))
+    _start()
+    onStart(ev, createCoreData(b, { x, y }))
   }
 
   handleDrag = (ev: DraggableEvent, b: DraggableData) => {
+    const { _drag, onDrag } = this.props as (Props & PropsFromParent)
     const dragX = b.lastX - this.lastX
     const dragY = b.lastY - this.lastY
-    const { x, y } = this.props._drag(dragX, dragY)
-    this.setState({ x, y })
+    const { x, y } = _drag(dragX, dragY)
 
-    this.props.onDrag(ev, createCoreData(b, {
+    this.setState({ x, y })
+    onDrag(ev, createCoreData(b, {
       originX: dragX,
       originY: dragY,
       x,
@@ -72,13 +76,15 @@ export class DraggableChild extends React.Component<Props, State> {
 
   handleStop = (ev: DraggableEvent, b: DraggableData) => {
     const { x, y } = this.state
-    this.props._stop()
-    this.props.onStop(ev, createCoreData(b, { x, y }))
+    const { _stop, onStop } = this.props as (Props & PropsFromParent)
+
+    _stop()
+    onStop(ev, createCoreData(b, { x, y }))
   }
 
   render() {
     const { x, y } = this.state
-    const { active, children, activeClassName } = this.props
+    const { active, children, activeClassName } = this.props as (Props & PropsFromParent)
     const style = {
       ...children.props.style,
       position: 'absolute',

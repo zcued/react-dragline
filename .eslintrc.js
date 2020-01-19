@@ -1,6 +1,8 @@
 module.exports = {
   extends: [
-    "plugin:react/recommended"
+    "plugin:react/recommended",
+    'plugin:@typescript-eslint/eslint-recommended',
+    'plugin:@typescript-eslint/recommended',
   ],
   parser: "@typescript-eslint/parser",  // Specifies the ESLint parser
   parserOptions: {
@@ -49,6 +51,19 @@ module.exports = {
 
     /** eslint-plugin-react */
     "react/jsx-uses-react": "error",
+
+    /** typescript-eslint */
+    "@typescript-eslint/member-delimiter-style": ["error", {
+      multiline: {
+        "delimiter": "comma",
+        "requireLast": true
+      },
+      singleline: {
+        "delimiter": "comma",
+        "requireLast": false
+      },
+    }],
+    "@typescript-eslint/explicit-function-return-type": "off",
   },
   settings: {
     react: {

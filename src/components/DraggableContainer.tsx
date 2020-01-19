@@ -3,10 +3,10 @@ import { unique, getMaxDistance } from './utils'
 
 
 interface Props {
-  tag: keyof JSX.IntrinsicElements
-  style: React.CSSProperties
+  tag: keyof JSX.IntrinsicElements,
+  style: React.CSSProperties,
   lineStyle: React.CSSProperties,
-  directions: Array<Direction>
+  directions: Array<Direction>,
   threshold: number,
   className: string,
   activeClassName: string,
@@ -14,20 +14,20 @@ interface Props {
 }
 
 interface State {
-  vLines: Array<AlignToken>
-  hLines: Array<AlignToken>
-  indices: Array<Number>
+  vLines: Array<AlignToken>,
+  hLines: Array<AlignToken>,
+  indices: Array<number>,
 }
 
 type AlignToken = {
   $: Element,
-  i: number
+  i: number,
   // 长度
-  length: number
+  length: number,
   // 辅助线起点坐标
-  origin: number
+  origin: number,
   // 辅助线坐标
-  value: number
+  value: number,
 }
 
 type DraggableElement = {
@@ -140,10 +140,9 @@ export class DraggableContainer extends React.Component<Props, State> {
    * @param {Array} compares 对照组
    */
   calcAndDrawLines(values: Grid, target: DraggableElement, compares: Array<DraggableElement>) {
-    const { v: x, indices: indices_x, lines: vLines } = this.calcPosValues(values, target, compares, 'x')
-    const { v: y, indices: indices_y, lines: hLines } = this.calcPosValues(values, target, compares, 'y')
-
-    const indices = unique(indices_x.concat(indices_y))
+    const { v: x, indices: indicesX, lines: vLines } = this.calcPosValues(values, target, compares, 'x')
+    const { v: y, indices: indicesY, lines: hLines } = this.calcPosValues(values, target, compares, 'y')
+    const indices = unique(indicesX.concat(indicesY))
 
     // https://github.com/zcued/react-dragline/issues/9
     if (vLines.length && hLines.length) {
@@ -203,8 +202,8 @@ export class DraggableContainer extends React.Component<Props, State> {
     const results: { [key: number]: Array<AlignToken> } = {}
 
     const directions: {
-      x: Array<DirectionX>
-      y: Array<DirectionY>
+      x: Array<DirectionX>,
+      y: Array<DirectionY>,
     } = {
       x: ['ll', 'rr', 'lr'],
       y: ['tt', 'bb', 'tb'],

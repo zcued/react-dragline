@@ -1,8 +1,10 @@
 import * as React from 'react'
 import { DraggableCore, DraggableEvent, DraggableData } from 'react-draggable'
 import classNames from 'classnames'
-import { createCoreData, noop } from './utils'
+import { createCoreData, noop, DragLineData } from './utils'
 
+
+type DragLineEvent = DraggableEvent
 
 interface Props {
   children: React.ReactElement,
@@ -10,18 +12,17 @@ interface Props {
     x: number,
     y: number,
   },
-  activeClassName?: string
-  onStart?: Function
-  onDrag?: Function
-  onStop?: Function
+  activeClassName?: string,
+  onStart?: (ev: DragLineEvent, b: DragLineData) => void,
+  onDrag?: (ev: DragLineEvent, b: DragLineData) => void,
+  onStop?: (ev: DragLineEvent, b: DragLineData) => void,
 }
 
 interface PropsFromParent {
-  _start?: Function
-  _drag?: Function
-  _stop?: Function
-
-  active?: boolean
+  _start: Function,
+  _drag: Function,
+  _stop: Function,
+  active: boolean,
 }
 
 interface State {
@@ -38,8 +39,8 @@ export class DraggableChild extends React.Component<Props, State> {
     onStop: noop,
   }
 
-  lastX: number = 0
-  lastY: number = 0
+  lastX = 0
+  lastY = 0
 
   constructor(props: Props) {
     super(props)

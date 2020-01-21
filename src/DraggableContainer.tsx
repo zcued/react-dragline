@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { unique, getMaxDistance } from './utils'
+import { Grid } from './types'
 
 
 interface Props {
@@ -45,12 +46,6 @@ type DraggableElement = {
   tb: number,
 }
 
-
-type Grid = {
-  x: number,
-  y: number,
-}
-
 type GridKey = keyof Grid
 
 type DirectionX = 'll' | 'rr' | 'lr'
@@ -58,9 +53,9 @@ type DirectionY = 'tt' | 'bb' | 'tb'
 type Direction = DirectionY | DirectionX
 
 export class DraggableContainer extends React.Component<Props, State> {
-  // container HTMLElement
+
   $: HTMLElement = null
-  // children HTMLElement
+
   $children: Array<DraggableElement> = []
 
   static defaultProps = {
@@ -114,8 +109,8 @@ export class DraggableContainer extends React.Component<Props, State> {
     this.setState({ vLines: [], hLines: [], indices: [] })
   }
 
-   // 拖动中计算是否吸附/显示辅助线
-   calc = (index: number) => {
+  // 拖动中计算是否吸附/显示辅助线
+  calc = (index: number) => {
     return (x: number, y: number) => {
       const target = this.$children[index]
       const compares = this.$children.filter((_, i) => i !== index)
@@ -134,7 +129,7 @@ export class DraggableContainer extends React.Component<Props, State> {
     }
   }
 
-   /**
+  /**
    * @param {Object} values xy坐标
    * @param {Object} target 拖拽目标
    * @param {Array} compares 对照组

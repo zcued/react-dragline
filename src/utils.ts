@@ -1,6 +1,8 @@
+import { DragLineData } from './types'
+
+
 export const noop = () => {}
 
-// 去重
 export function unique<T>(array: Array<T>, compare = (a: T, b: T) => a === b) {
   const result = []
   for (let i = 0, len = array.length; i < len; i++) {
@@ -17,21 +19,11 @@ export const getMaxDistance = (arr: number[]) => {
   return num[num.length - 1] - num[0]
 }
 
-export type DragLineData = {
-  node: HTMLElement,
-  deltaY: number,
-  deltaX: number,
-  originX: number,
-  originY: number,
-  x: number,
-  y: number,
-}
-
 export const createCoreData = (
   { node, deltaX, deltaY }: { node: HTMLElement, deltaX: number, deltaY: number },
   { originX, originY, x, y }: { originX?: number, originY?: number, x: number, y: number }
 ) => {
-  const draglineData: DragLineData = {
+  const draglineData = {
     node,
     deltaY,
     deltaX,
@@ -39,7 +31,7 @@ export const createCoreData = (
     originY: originY || y,
     x,
     y,
-  }
+  } as DragLineData
 
   return draglineData
 }

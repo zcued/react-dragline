@@ -1,10 +1,9 @@
 import * as React from 'react'
-import { DraggableCore, DraggableEvent, DraggableData } from 'react-draggable'
+import { DraggableCore, DraggableEventHandler } from 'react-draggable'
 import classNames from 'classnames'
-import { createCoreData, noop, DragLineData } from './utils'
+import { createCoreData, noop } from './utils'
+import { DragLineEventHandler, Grid } from './types'
 
-
-type DragLineEvent = DraggableEvent
 
 interface Props {
   children: React.ReactElement,
@@ -13,22 +12,19 @@ interface Props {
     y: number,
   },
   activeClassName?: string,
-  onStart?: (ev: DragLineEvent, b: DragLineData) => void,
-  onDrag?: (ev: DragLineEvent, b: DragLineData) => void,
-  onStop?: (ev: DragLineEvent, b: DragLineData) => void,
+  onStart?: DragLineEventHandler,
+  onDrag?: DragLineEventHandler,
+  onStop?: DragLineEventHandler,
 }
 
 interface PropsFromParent {
-  _start: Function,
-  _drag: Function,
-  _stop: Function,
+  _start: () => void,
+  _drag: (dragX: number, dragY: number) => Grid,
+  _stop: () => void,
   active: boolean,
 }
 
-interface State {
-  x: number,
-  y: number,
-}
+interface State extends Grid {}
 
 export class DraggableChild extends React.Component<Props, State> {
 
@@ -50,7 +46,7 @@ export class DraggableChild extends React.Component<Props, State> {
     }
   }
 
-  handleStart = (ev: DraggableEvent, b: DraggableData) => {
+  handleStart: DraggableEventHandler = (ev, b) => {
     const { _start, onStart } = this.props as (Props & PropsFromParent)
     const { x, y } = this.state
 
@@ -60,7 +56,7 @@ export class DraggableChild extends React.Component<Props, State> {
     onStart(ev, createCoreData(b, { x, y }))
   }
 
-  handleDrag = (ev: DraggableEvent, b: DraggableData) => {
+  handleDrag: DraggableEventHandler = (ev, b) => {
     const { _drag, onDrag } = this.props as (Props & PropsFromParent)
     const dragX = b.lastX - this.lastX
     const dragY = b.lastY - this.lastY
@@ -75,7 +71,7 @@ export class DraggableChild extends React.Component<Props, State> {
     }))
   }
 
-  handleStop = (ev: DraggableEvent, b: DraggableData) => {
+  handleStop: DraggableEventHandler = (ev, b) => {
     const { x, y } = this.state
     const { _stop, onStop } = this.props as (Props & PropsFromParent)
 

@@ -3,5 +3,8 @@
     "declaration": true,
     "declarationDir": "typings",
     "jsx": "react"
-  }
+  },
+  "include": [
+    "./src/**/*"
+  ]
 }

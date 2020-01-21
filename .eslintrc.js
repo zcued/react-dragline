@@ -53,6 +53,8 @@ module.exports = {
     "react/jsx-uses-react": "error",
 
     /** typescript-eslint */
+    "@typescript-eslint/indent": ["error", 2],
+
     "@typescript-eslint/member-delimiter-style": ["error", {
       multiline: {
         "delimiter": "comma",
@@ -63,6 +65,14 @@ module.exports = {
         "requireLast": false
       },
     }],
+
+    "@typescript-eslint/no-empty-interface": [
+      "error",
+      {
+        "allowSingleExtends": true
+      }
+    ],
+
     "@typescript-eslint/explicit-function-return-type": "off",
   },
   settings: {

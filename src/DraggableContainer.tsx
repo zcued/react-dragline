@@ -31,7 +31,7 @@ type AlignToken = {
   value: number,
 }
 
-type DraggableElement = {
+export type DraggableElement = {
   $: Element,
   i: number,
   x: number,

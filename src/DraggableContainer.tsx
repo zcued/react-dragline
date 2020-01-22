@@ -78,7 +78,6 @@ export class DraggableContainer extends React.Component<Props, State> {
   initialize = () => {
     if (Array.isArray(this.props.children)) {
       this.$children = this.props.children.map((_, i) => {
-        // const $ = this.$.childNodes[i]
         const $ = this.$.children[i]
         const x = Number($.getAttribute('data-x'))
         const y = Number($.getAttribute('data-y'))

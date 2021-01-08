@@ -63,15 +63,22 @@ class Example extends React.Component {
 ReactDOM.render(<Example />, container)
 ```
 
-### Prop Types
+### Prop Types: DraggableContainer
 | Property | Type | Default | Description |
 | :-- | :-- | :-- | :-- |
 | Container | String/Element | 'div' | The `DraggableContainer` will be rendered as a HTML tag or the React Component you specify |
 | threshold | Number | 5 | The max distance of between others and the dragging element triggering magnetic adsorption |
-| directions | Array | ['tt', 'bb', 'll', 'rr', 'tb', 'lr' ] | The directions you want. `tt` indicate the guide line will show when a element aligned with the top of the dragging element. |
+| directions | Array | ['tt', 'bb', 'll', 'rr', 'tb', 'lr', 'rl', 'mh', 'mv'] | The directions you want. `tt` indicate the guide line will show when a element aligned with the top of the dragging element. |
 | activeClassName | String | 'active' | if you want to add class name for the element aligned with one you drag, use it.|
 | lineStyle | Object | {} | You can customize the style of auxiliary line by this option |
-| limit | String | true | Whether to restricts movement within the container |
+| limit | Boolean | true | Whether to restricts movement within the container |
+| detectOverlap | Boolean | false | If true, then you can't drag block throw other blocks |
+
+### Prop Types: DraggableChild
+| Property | Type | Default | Description |
+| :-- | :-- | :-- | :-- |
+| axis | String | both | Determines which axis the draggable can move (both, x, y) |
+| grid | Array | [1,1] | Specifies the x and y that dragging should snap to |
 
 ### Contributing
 1. Fork, then clone the project.

@@ -1,13 +1,15 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { unique, checkArrayWithPush, getMaxDistance } from './utils'
-
+import { checkArrayWithPush, checkOverlapRectangles, getMaxDistance, unique } from './utils'
+import isEqual from 'lodash.isequal'
 
 export default class DraggableContainer extends React.Component {
   // container HTMLElement
   $ = null
   // children HTMLElement
   $children = []
+  lastXpostion = null
+  lastYpostion = null
 
   static propTypes = {
     Container: PropTypes.oneOfType([
@@ -21,17 +23,19 @@ export default class DraggableContainer extends React.Component {
     activeClassName: PropTypes.string,
     limit: PropTypes.bool,
     lineStyle: PropTypes.object,
+    detectOverlap: PropTypes.bool,
   }
 
   static defaultProps = {
     Container: 'div',
     style: {},
-    directions: ['tt', 'bb', 'll', 'rr', 'tb', 'lr' ],
+    directions: ['tt', 'bb', 'll', 'rr', 'tb', 'lr', 'rl', 'mv', 'mh'],
     threshold: 5,
     className: '',
     activeClassName: 'active',
     limit: true,
     lineStyle: {},
+    detectOverlap: false,
   }
 
   constructor(props) {
@@ -44,7 +48,12 @@ export default class DraggableContainer extends React.Component {
     }
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    return !isEqual(this.state, nextState) || !isEqual(this.props, nextProps)
+  }
+
   // 拖拽初始时 计算出所有元素的坐标信息，存储于this.$children
+  // The coordinate information of all elements is calculated at the beginning of dragging and stored in this.$children
   initialize = () => {
     this.$children = this.props.children.map((child, i) => {
       const $ = this.$.childNodes[i]
@@ -75,6 +84,7 @@ export default class DraggableContainer extends React.Component {
   }
 
   // 拖动中计算是否吸附/显示辅助线
+  // Calculate whether to adsorb/display auxiliary lines while dragging
   calc = (index) => {
     return (x, y) => {
       const target = this.$children[index]
@@ -86,12 +96,34 @@ export default class DraggableContainer extends React.Component {
         y = limitY
       }
 
+      if (this.props.detectOverlap) {
+        if (this.checkOverlap({ x, y }, target)) {
+          if (this.lastXpostion === null) {
+            this.lastXpostion = x
+            this.lastYpostion = y
+          }
+          return { x: this.lastXpostion, y: this.lastYpostion }
+        }
+      }
+      this.lastXpostion = null
+      this.lastYpostion = null
+
       if (compares.length === 0) {
         return { x, y }
       }
 
       return this.calcAndDrawLines({ x, y }, target, compares)
     }
+  }
+
+  checkOverlap({ x, y }, target) {
+    for (let i = 0; i < this.$children.length; i += 1) {
+      if (i === target.i) continue
+
+      if (checkOverlapRectangles({ ...target, ...{ x, y } }, this.$children[i]))
+        return true
+    }
+    return false
   }
 
   /**
@@ -114,7 +146,6 @@ export default class DraggableContainer extends React.Component {
         line.length = length
         line.origin = origin
       })
-
 
       hLines.forEach(line => {
         const compare = compares.find(({ i }) => i === line.i)
@@ -158,8 +189,8 @@ export default class DraggableContainer extends React.Component {
     const results = {}
 
     const directions = {
-      x: ['ll', 'rr', 'lr'],
-      y: ['tt', 'bb', 'tb'],
+      x: ['ll', 'rr', 'lr', 'rl', 'mh'],
+      y: ['tt', 'bb', 'tb', 'mv'],
     }
 
     // filter unnecessary directions
@@ -169,7 +200,7 @@ export default class DraggableContainer extends React.Component {
       validDirections.forEach(dire => {
         const { near, dist, value, origin, length } = this.calcPosValuesSingle(values, dire, target, compare, key)
         if (near) {
-          checkArrayWithPush(results, dist, { i: compare.i, $: compare.$ , value, origin, length })
+          checkArrayWithPush(results, dist, { i: compare.i, $: compare.$, value, origin, length })
         }
       })
     })
@@ -198,27 +229,39 @@ export default class DraggableContainer extends React.Component {
     const { x, y } = values
     const W = target.w
     const H = target.h
-    const { l, r, t, b, lr, tb } = compare
+    const { l, r, t, b, lr, tb, x: xCompare } = compare
     const { origin, length } = this.calcLineValues({ x, y }, target, compare, key)
 
     const result = {
       // 距离是否达到吸附阈值
+      // Whether the distance reaches the adsorption threshold
       near: false,
       // 距离差
+      // Distance difference
       dist: Number.MAX_SAFE_INTEGER,
       // 辅助线坐标
+      // Auxiliary line coordinates
       value: 0,
       // 辅助线长度
       length,
       // 辅助线起始坐标（对应绝对定位的top/left）
+      // Starting coordinates of auxiliary line (corresponding to top/left of absolute positioning)
       origin,
     }
 
     switch (dire) {
-      case 'lr':
-        result.dist = x + W / 2 - lr
-        result.value = lr
+      case 'lr': {
+        const sides = []
+        sides.push({ dist: x - r, value: r }) // right side
+        sides.push({ dist: x + W - xCompare, value: l }) // left side
+        sides.forEach(side => {
+          if (Math.abs(side.dist) < Math.abs(result.dist)) {
+            result.dist = side.dist
+            result.value = side.value
+          }
+        })
         break
+      }
       case 'll':
         result.dist = x - l
         result.value = l
@@ -235,9 +278,25 @@ export default class DraggableContainer extends React.Component {
         result.dist = y + H - b
         result.value = b
         break
-      case 'tb':
+      case 'tb': {
+        const sides = []
+        sides.push({ dist: y + H - t, value: t }) // top side
+        sides.push({ dist: y - b, value: b }) // bottom side
+        sides.forEach(side => {
+          if (Math.abs(side.dist) < Math.abs(result.dist)) {
+            result.dist = side.dist
+            result.value = side.value
+          }
+        })
+        break
+      }
+      case 'mv': // middle vertical
         result.dist = y + H / 2 - tb
         result.value = tb
+        break
+      case 'mh': // middle horizontal
+        result.dist = x + W / 2 - lr
+        result.value = lr
         break
     }
 
@@ -249,6 +308,7 @@ export default class DraggableContainer extends React.Component {
   }
 
   // 检查是否拖出容器
+  // Check if you drag out the container
   checkDragOut({ x, y }, target) {
     const maxLeft = this.$.clientWidth - target.w
     const maxTop = this.$.clientHeight - target.h

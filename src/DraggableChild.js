@@ -2,8 +2,7 @@ import React from 'react'
 import { DraggableCore } from 'react-draggable'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
-import { createCoreData, noop } from './utils'
-
+import { canDragX, canDragY, createCoreData, noop } from './utils'
 
 export default class DraggableChild extends React.Component {
   static propTypes = {
@@ -12,13 +11,17 @@ export default class DraggableChild extends React.Component {
     onStart: PropTypes.func,
     onDrag: PropTypes.func,
     onStop: PropTypes.func,
+    axis: PropTypes.oneOf(['both', 'x', 'y']),
+    grid: PropTypes.object,
   }
 
   static defaultProps = {
+    axis: 'both',
     defaultPosition: { x: 0, y: 0 },
     onStart: noop,
     onDrag: noop,
     onStop: noop,
+    grid: [1,1],
   }
 
   constructor(props) {
@@ -32,17 +35,28 @@ export default class DraggableChild extends React.Component {
     this.y = props.defaultPosition.y
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    return (this.compareCoordinates(this.props.defaultPosition, nextProps.defaultPosition) ||
+      this.compareCoordinates(this.state, nextState) ||
+        this.props.active !== nextProps.active
+    )
+  }
+
+  compareCoordinates = (firstCoords, secondCoords) => {
+    return (firstCoords.x !== secondCoords.x || firstCoords.y !== secondCoords.y)
+  }
+
   handleStart = (ev, b) => {
     const { x, y } = this.state
-    this.lastX = b.lastX - x
-    this.lastY = b.lastY - y
+    this.lastX = canDragX(this.props.axis) ? b.lastX - x : x
+    this.lastY = canDragY(this.props.axis) ? b.lastY - y : y
     this.props._start()
     this.props.onStart(ev, createCoreData(b, { x, y }))
   }
 
   handleDrag = (ev, b) => {
-    const dragX = b.lastX - this.lastX
-    const dragY = b.lastY - this.lastY
+    const dragX = canDragX(this.props.axis) ? b.lastX - this.lastX : this.lastX
+    const dragY = canDragY(this.props.axis) ? b.lastY - this.lastY : this.lastY
     const { x, y } = this.props._drag(dragX, dragY)
     this.setState({ x, y })
 
@@ -62,7 +76,7 @@ export default class DraggableChild extends React.Component {
 
   render() {
     const { x, y } = this.state
-    const { active, children, activeClassName } = this.props
+    const { active, children, activeClassName, grid } = this.props
     const style = {
       ...children.props.style,
       position: 'absolute',
@@ -76,7 +90,7 @@ export default class DraggableChild extends React.Component {
 
     return (
       <DraggableCore
-        grid={[1, 1]}
+        grid={grid}
         onDrag={this.handleDrag}
         onStop={this.handleStop}
         onStart={this.handleStart}

@@ -12,7 +12,7 @@ export default class DraggableChild extends React.Component {
     onDrag: PropTypes.func,
     onStop: PropTypes.func,
     axis: PropTypes.oneOf(['both', 'x', 'y']),
-    grid: PropTypes.object,
+    grid: PropTypes.array,
   }
 
   static defaultProps = {

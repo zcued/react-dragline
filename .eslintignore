@@ -1,9 +1,0 @@
-node_modules
-build
-dist
-lib
-example
-docs
-__tests__
-enzyme.setup.js
-jest.config.js

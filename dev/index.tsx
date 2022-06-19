@@ -1,13 +1,40 @@
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import { DraggableContainer, DraggableChild } from '../src/index'
+
+// interface Props {
+//   children: React.ReactNode
+// }
+
+// class Com1 extends React.Component<Props> {
+//   render() {
+//     return (
+//       <h1>{ this.props.children }</h1>
+//     )
+//   }
+// }
+
+// const App = () => {
+//   return (
+//     <div>
+//       <Com1>hello 1111 world</Com1>
+//       123
+//     </div>
+//   )
+// }
+
+
+
 const initialChildren = [
-  { id: 1, background: '#8ce8df', size: 100, position: {x: 100, y: 0} },
-  { id: 2, background: '#8ce8df', size: 100, position: {x: 200, y: 106} },
-  { id: 3, background: '#afc7fd', size: 102, position: {x: 500, y: 106} },
-  { id: 4, background: '#d2aff6', size: 150, position: {x: 100, y: 316} },
-  { id: 5, background: '#fee493', size: 200, position: {x: 480, y: 376} },
+  { id: 1, background: '#8ce8df', size: 100, position: { x: 100, y: 10 }},
+  { id: 2, background: '#8ce8df', size: 100, position: { x: 400, y: 106 }},
+  { id: 3, background: '#d2aff6', size: 150, position: { x: 100, y: 316 }},
+  { id: 4, background: '#fee493', size: 200, position: { x: 480, y: 376 }},
 ]
 
-function Example() {
-  const containerStyle = {
+
+function App() {
+  const containerStyle: React.CSSProperties = {
     position: 'relative',
     height: 600,
     boxShadow: '0 0 5px 1px #CCC inset',
@@ -16,7 +43,7 @@ function Example() {
     margin: 20,
   }
 
-  const childStyle = {
+  const childStyle: React.CSSProperties = {
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
@@ -54,4 +81,8 @@ function Example() {
   )
 }
 
-ReactDOM.render(<Example />, document.getElementById('root'))
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+)

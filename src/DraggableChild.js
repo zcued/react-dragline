@@ -51,7 +51,7 @@ export default class DraggableChild extends React.Component {
     this.lastX = canDragX(this.props.axis) ? b.lastX - x : x
     this.lastY = canDragY(this.props.axis) ? b.lastY - y : y
     this.props._start()
-    this.props.onStart(ev, createCoreData(b, { x, y }))
+    return this.props.onStart(ev, createCoreData(b, { x, y }))
   }
 
   handleDrag = (ev, b) => {
@@ -60,7 +60,7 @@ export default class DraggableChild extends React.Component {
     const { x, y } = this.props._drag(dragX, dragY)
     this.setState({ x, y })
 
-    this.props.onDrag(ev, createCoreData(b, {
+    return this.props.onDrag(ev, createCoreData(b, {
       originX: dragX,
       originY: dragY,
       x,
@@ -71,7 +71,7 @@ export default class DraggableChild extends React.Component {
   handleStop = (ev, b) => {
     const { x, y } = this.state
     this.props._stop()
-    this.props.onStop(ev, createCoreData(b, { x, y }))
+    return this.props.onStop(ev, createCoreData(b, { x, y }))
   }
 
   render() {
